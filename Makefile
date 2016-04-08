@@ -178,7 +178,7 @@ ifneq ($(CPU_ONLY), 1)
 	LIBRARIES := cudart cublas curand
 endif
 
-LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_hl hdf5
+LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_hl hdf5 
 
 # handle IO dependencies
 USE_LEVELDB ?= 1
@@ -197,7 +197,6 @@ ifeq ($(USE_OPENCV), 1)
 	ifeq ($(OPENCV_VERSION), 3)
 		LIBRARIES += opencv_imgcodecs
 	endif
-		
 endif
 PYTHON_LIBRARIES ?= boost_python python2.7
 WARNINGS := -Wall -Wno-sign-compare
@@ -395,18 +394,30 @@ else
 		endif
 	endif
 endif
+
 INCLUDE_DIRS += $(BLAS_INCLUDE)
 LIBRARY_DIRS += $(BLAS_LIB)
 
 LIBRARY_DIRS += $(LIB_BUILD_DIR)
 
+
+#VIC
+LIBRARY_DIRS += $(shell larcv-config --libdir)
+LIBRARY_DIRS += $(shell root-config --libdir)
+
+INCLUDE_DIRS += $(shell larcv-config --incdir)
+INCLUDE_DIRS += $(shell root-config --incdir)
+
+LDFLAGS += $(shell root-config --libs)
+LDFLAGS += $(shell larcv-config --libs)
+
 # Automatic dependency generation (nvcc is handled separately)
-CXXFLAGS += -MMD -MP
+CXXFLAGS += -MMD -MP $(shell root-config --cflags)
 
 # Complete build flags.
 COMMON_FLAGS += $(foreach includedir,$(INCLUDE_DIRS),-I$(includedir))
 CXXFLAGS += -pthread -fPIC $(COMMON_FLAGS) $(WARNINGS)
-NVCCFLAGS += -ccbin=$(CXX) -Xcompiler -fPIC $(COMMON_FLAGS)
+NVCCFLAGS += -ccbin=$(CXX) -Xcompiler -fPIC $(COMMON_FLAGS) -std=c++11
 # mex may invoke an older gcc that is too liberal with -Wuninitalized
 MATLAB_CXXFLAGS := $(CXXFLAGS) -Wno-uninitialized
 LINKFLAGS += -pthread -fPIC $(COMMON_FLAGS) $(WARNINGS)
@@ -417,8 +428,11 @@ ifeq ($(USE_PKG_CONFIG), 1)
 else
 	PKG_CONFIG :=
 endif
+
+#vic
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir)) $(PKG_CONFIG) \
 		$(foreach library,$(LIBRARIES),-l$(library))
+
 PYTHON_LDFLAGS := $(LDFLAGS) $(foreach library,$(PYTHON_LIBRARIES),-l$(library))
 
 # 'superclean' target recursively* deletes all files ending with an extension
@@ -564,6 +578,7 @@ $(ALL_BUILD_DIRS): | $(BUILD_DIR_LINK)
 
 $(DYNAMIC_NAME): $(OBJS) | $(LIB_BUILD_DIR)
 	@ echo LD -o $@
+	@echo $(Q)$(CXX) -shared -o $@ $(OBJS) $(VERSIONFLAGS) $(LINKFLAGS) $(LDFLAGS)
 	$(Q)$(CXX) -shared -o $@ $(OBJS) $(VERSIONFLAGS) $(LINKFLAGS) $(LDFLAGS)
 	@ cd $(BUILD_DIR)/lib; rm -f $(DYNAMIC_NAME_SHORT);   ln -s $(DYNAMIC_VERSIONED_NAME_SHORT) $(DYNAMIC_NAME_SHORT)
 
@@ -573,6 +588,7 @@ $(STATIC_NAME): $(OBJS) | $(LIB_BUILD_DIR)
 
 $(BUILD_DIR)/%.o: %.cpp | $(ALL_BUILD_DIRS)
 	@ echo CXX $<
+	@echo $(Q)$(CXX) $< $(CXXFLAGS) -c -o $@ 2> $@.$(WARNS_EXT) || (cat $@.$(WARNS_EXT); exit 1)
 	$(Q)$(CXX) $< $(CXXFLAGS) -c -o $@ 2> $@.$(WARNS_EXT) \
 		|| (cat $@.$(WARNS_EXT); exit 1)
 	@ cat $@.$(WARNS_EXT)
@@ -617,6 +633,7 @@ $(TOOL_BUILD_DIR)/%: $(TOOL_BUILD_DIR)/%.bin | $(TOOL_BUILD_DIR)
 
 $(TOOL_BINS): %.bin : %.o | $(DYNAMIC_NAME)
 	@ echo CXX/LD -o $@
+	@echo $(Q)$(CXX) $< -o $@ $(LINKFLAGS) -l$(LIBRARY_NAME) $(LDFLAGS) -Wl,-rpath,$(ORIGIN)/../lib
 	$(Q)$(CXX) $< -o $@ $(LINKFLAGS) -l$(LIBRARY_NAME) $(LDFLAGS) \
 		-Wl,-rpath,$(ORIGIN)/../lib
 

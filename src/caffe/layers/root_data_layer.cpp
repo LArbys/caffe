@@ -22,14 +22,14 @@ namespace caffe {
   // Load data and label from ROOT filename into the class property blobs.
   template <typename Dtype>
   void ROOTDataLayer<Dtype>::LoadROOTFileData(const char* filename) {
-    DLOG(INFO) << "Loading ROOT file: " << filename;
+    std::cout << "Loading ROOT file: " << filename;
 
+    // _iom.set_verbosity(::larcv::msg::kDEBUG);
     _iom.add_in_file(filename);
     _iom.initialize();
     
     int top_size = this->layer_param_.top_size();
     root_blobs_.resize(top_size);
-
     const int MIN_DATA_DIM = 1;
     const int MAX_DATA_DIM = INT_MAX;
 
@@ -40,8 +40,7 @@ namespace caffe {
 			   MIN_DATA_DIM, MAX_DATA_DIM, root_blobs_[i].get());
 
     }
-
-
+    _iom.finalize();
     // MinTopBlobs==1 guarantees at least one top blob
     CHECK_GE(root_blobs_[0]->num_axes(), 1) << "Input must have at least 1 axis.";
     const int num = root_blobs_[0]->shape(0);

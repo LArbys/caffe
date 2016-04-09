@@ -14,7 +14,7 @@ namespace caffe {
 
   template <typename Dtype>
   void root_load_nd_dataset_helper(::larcv::EventBase* ev_data, 
-				   const char* dataset_name_, 
+				   int nentries, 
 				   int min_dim, 
 				   int max_dim,
 				   Blob<Dtype>* blob);

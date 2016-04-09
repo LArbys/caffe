@@ -20,12 +20,11 @@ namespace caffe {
     ROOTDataLayerTest()
       : filename(NULL),
         blob_top_data_(new Blob<Dtype>()),
-        blob_top_label_(new Blob<Dtype>()),
-        blob_top_label2_(new Blob<Dtype>()) {}
+        blob_top_label_(new Blob<Dtype>()) {}
+	
     virtual void SetUp() {
       blob_top_vec_.push_back(blob_top_data_);
       blob_top_vec_.push_back(blob_top_label_);
-      blob_top_vec_.push_back(blob_top_label2_);
 
       // Check out generate_sample_data.py in the same directory.
       filename = new string(
@@ -36,14 +35,12 @@ namespace caffe {
     virtual ~ROOTDataLayerTest() {
       delete blob_top_data_;
       delete blob_top_label_;
-      delete blob_top_label2_;
       delete filename;
     }
 
     string* filename;
     Blob<Dtype>* const blob_top_data_;
     Blob<Dtype>* const blob_top_label_;
-    Blob<Dtype>* const blob_top_label2_;
     vector<Blob<Dtype>*> blob_bottom_vec_;
     vector<Blob<Dtype>*> blob_top_vec_;
   };
@@ -64,27 +61,29 @@ namespace caffe {
     root_data_param->set_batch_size(batch_size);
     root_data_param->set_source(*(this->filename));
     int num_cols = 3;
-    int height = 10;
-    int width = 10;
+    int height   = 10;
+    int width    = 10;
 
     // Test that the layer setup got the correct parameters.
     ROOTDataLayer<Dtype> layer(param);
     layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
+
     EXPECT_EQ(this->blob_top_data_->num(), batch_size);
     EXPECT_EQ(this->blob_top_data_->channels(), num_cols);
     EXPECT_EQ(this->blob_top_data_->height(), height);
     EXPECT_EQ(this->blob_top_data_->width(), width);
-
-    EXPECT_EQ(this->blob_top_label_->num_axes(), 2);
+    EXPECT_EQ(this->blob_top_label_->num_axes(), 4);
     EXPECT_EQ(this->blob_top_label_->shape(0), batch_size);
-    EXPECT_EQ(this->blob_top_label_->shape(1), 1);
+    EXPECT_EQ(this->blob_top_label_->shape(1), 3);
 
     layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
     
     // Go through the data 10 times (5 batches).
-    // const int data_size = num_cols * height * width;
+    const int data_size = num_cols * height * width;
     // for (int iter = 0; iter < 10; ++iter) {
-    //   layer.Forward(this->blob_bottom_vec_, this->blob_top_vec_);
+
+    std::cout << "\t>> Calling layer.Forward(....)\n";
+    layer.Forward(this->blob_bottom_vec_, this->blob_top_vec_);
 
     //   // On even iterations, we're reading the first half of the data.
     //   // On odd iterations, we're reading the second half of the data.
@@ -102,22 +101,24 @@ namespace caffe {
     // 		  label_offset + i,
     // 		  this->blob_top_label_->cpu_data()[i]);
     //   }
-    //   for (int i = 0; i < batch_size; ++i) {
-    // 	for (int j = 0; j < num_cols; ++j) {
-    // 	  for (int h = 0; h < height; ++h) {
-    // 	    for (int w = 0; w < width; ++w) {
-    // 	      int idx = (i * num_cols * height * width +
-    // 			 j * height * width +
-    // 			 h * width + w);
+    for (int i = 0; i < batch_size; ++i) {
+      for (int j = 0; j < num_cols; ++j) {
+	for (int h = 0; h < height; ++h) {
+	  for (int w = 0; w < width; ++w) {
+	    int idx = ( i * num_cols * height * width +
+		        j * height * width +
+		        h * width + w );
 	      
-    // 	      EXPECT_EQ(file_offset + data_offset + idx,
-    // 			this->blob_top_data_->cpu_data()[idx])
-    // 		<< "debug: i " << i << " j " << j
-    // 		<< " iter " << iter;
-    // 	    }
-    // 	  }
-    // 	}
-    //   }
+	    EXPECT_EQ( idx,
+		       this->blob_top_data_->cpu_data()[idx]);
+	      
+	      // << "debug: i " << i << " j " << j;
+	      // << " iter " << iter;
+	  }
+	}
+      }
+    }
+
     // }
   }
 }  // namespace caffe

@@ -33,14 +33,19 @@ namespace caffe {
     const int MIN_DATA_DIM = 1;
     const int MAX_DATA_DIM = INT_MAX;
 
-    for (int i = 0; i < top_size; ++i) {
-      root_blobs_[i] = shared_ptr<Blob<Dtype> >(new Blob<Dtype>());
+    // should only be size 2 data and label, but user 
+    // could put then in any order...
+    for (int i = 0; i < top_size; ++i) 
       
-      root_load_nd_dataset(&_iom, this->layer_param_.top(i).c_str(),
-			   MIN_DATA_DIM, MAX_DATA_DIM, root_blobs_[i].get());
-
-    }
+      root_blobs_[i] = shared_ptr<Blob<Dtype> >(new Blob<Dtype>());
+    
+    
+    root_load_data(&_iom,
+		   root_blobs_[0].get(),
+		   root_blobs_[1].get());
+    
     _iom.finalize();
+
     // MinTopBlobs==1 guarantees at least one top blob
     CHECK_GE(root_blobs_[0]->num_axes(), 1) << "Input must have at least 1 axis.";
     const int num = root_blobs_[0]->shape(0);

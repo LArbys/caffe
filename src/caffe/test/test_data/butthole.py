@@ -9,9 +9,13 @@ iom.initialize()
 for i in xrange(10):
 
     ev_image = iom.get_data(larcv.kProductImage2D,"event_image")
+    ev_roi   = iom.get_data(larcv.kProductROI,"event_roi")
     
     for ix  in xrange(3):
         img = larcv.Image2D(10,10)
+        roi = larcv.ROI(larcv.kROIPizero,
+                        larcv.kShapeTrack)
+        ev_roi.Append( roi )
 
         for ii in xrange(10):
             for jj in xrange(10):

@@ -72,10 +72,11 @@ namespace caffe {
     EXPECT_EQ(this->blob_top_data_->channels(), num_cols);
     EXPECT_EQ(this->blob_top_data_->height(), height);
     EXPECT_EQ(this->blob_top_data_->width(), width);
-    EXPECT_EQ(this->blob_top_label_->num_axes(), 4);
-    EXPECT_EQ(this->blob_top_label_->shape(0), batch_size);
-    EXPECT_EQ(this->blob_top_label_->shape(1), 3);
 
+    EXPECT_EQ(this->blob_top_label_->num_axes(), 1);
+    std::cout << "shape(0)\n";
+    EXPECT_EQ(this->blob_top_label_->shape(0), batch_size);
+    std::cout << "\t >> layer SetUp \n";
     layer.SetUp(this->blob_bottom_vec_, this->blob_top_vec_);
     
     // Go through the data 10 times (5 batches).

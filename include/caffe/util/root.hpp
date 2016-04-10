@@ -6,26 +6,20 @@
 //LArCV
 #include "DataFormat/IOManager.h"
 #include "DataFormat/EventImage2D.h"
+#include "DataFormat/EventROI.h"
 
 //Caffe
 #include "caffe/blob.hpp"
 
 namespace caffe {
 
+  
   template <typename Dtype>
-  void root_load_nd_dataset_helper(::larcv::EventBase* ev_data, 
-				   int nentries, 
-				   int min_dim, 
-				   int max_dim,
-				   Blob<Dtype>* blob);
-
-  template <typename Dtype>
-  void root_load_nd_dataset(::larcv::IOManager* iom, 
-			    const char* dataset_name_, 
-			    int min_dim,
-			    int max_dim,
-			    Blob<Dtype>* blob);
-
+  void root_load_data(::larcv::IOManager* iom,
+		      Blob<Dtype>* data_blob,
+		      Blob<Dtype>* label_blob);
+  
+  
 }  // namespace caffe
 
 #endif   // CAFFE_UTIL_ROOT_H_

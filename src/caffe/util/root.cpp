@@ -52,27 +52,27 @@ namespace caffe {
       ev_data  = (::larcv::EventImage2D*)(iom->get_data(::larcv::kProductImage2D,"event_image"));
       roi_data = (::larcv::EventROI*)    (iom->get_data(::larcv::kProductROI    ,"event_roi"));
       
-      std::cout << "\t>> ENTRY: " << entry << "\n";
+      std::cout << "\t>> LOADING ENTRY: " << entry << "\n";
 
       label[ entry ] = ( float ) roi_data->at(0).Type(); //float is o.k. ?
       
       auto const& imgs = ev_data->Image2DArray();
     
       for(size_t ch=0;ch<nchannels;++ch) {
-	std::cout << "CH: " << ch << "\n";
+	//std::cout << "CH: " << ch << "\n";
 	
 	const std::vector<float> & v = imgs[ ch ].as_vector();
 	size_t len = v.size();
 
 	for(size_t j=0;j<len;++j)  {
 	  data[ ( entry * nchannels + ch)*len + j ] = v[j];
-	  std::cout << v[j] << " ";
+	  //std::cout << v[j] << " ";
 
-	  if ( j%10 == 0 && j != 0) std::cout << "\n";
+	  //if ( j%10 == 0 && j != 0) std::cout << "\n";
 
 	}
 
-	std::cout << "\n";
+	//std::cout << "\n";
       }
 
     }
@@ -84,6 +84,7 @@ namespace caffe {
     memcpy(label_blob->mutable_cpu_data(),label.data(),label.size() * sizeof(float) );
     
   }
+
   template <>
   void root_load_data<double>(::larcv::IOManager* iom, 
 			     Blob<double>* data_blob,
@@ -131,30 +132,27 @@ namespace caffe {
       ev_data  = (::larcv::EventImage2D*)(iom->get_data(::larcv::kProductImage2D,"event_image"));
       roi_data = (::larcv::EventROI*)    (iom->get_data(::larcv::kProductROI    ,"event_roi"));
       
-      std::cout << "\t>> ENTRY: " << entry << "\n";
+      std::cout << "\t>> LOADING ENTRY: " << entry << "\n";
 
-
-      label[ entry ] = ( double ) roi_data->at(0).Type(); //float is o.k. ?
+      label[ entry ] = ( double ) roi_data->at(0).Type(); //double is o.k. ?
       
       auto const& imgs = ev_data->Image2DArray();
-
-
     
       for(size_t ch=0;ch<nchannels;++ch) {
-	std::cout << "CH: " << ch << "\n";
+	//std::cout << "CH: " << ch << "\n";
 	
 	const std::vector<float> & v = imgs[ ch ].as_vector();
 	size_t len = v.size();
 
 	for(size_t j=0;j<len;++j)  {
 	  data[ ( entry * nchannels + ch)*len + j ] = v[j];
-	  std::cout << v[j] << " ";
+	  //std::cout << v[j] << " ";
 
-	  if ( j%10 == 0 && j != 0) std::cout << "\n";
+	  //if ( j%10 == 0 && j != 0) std::cout << "\n";
 
 	}
 
-	std::cout << "\n";
+	//std::cout << "\n";
       }
 
     }
@@ -166,7 +164,5 @@ namespace caffe {
     memcpy(label_blob->mutable_cpu_data(),label.data(),label.size() * sizeof(double) );
     
   }
-
-
 
 }  // namespace caffe

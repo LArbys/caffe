@@ -76,23 +76,26 @@ namespace caffe {
       this->type() << " does not transform data.";
     // Read the source to parse the filenames.
     const string& source = this->layer_param_.root_data_param().source();
-    LOG(INFO) << "Loading list of ROOT filenames from: " << source;
-    root_filenames_.clear();
-    std::ifstream source_file(source.c_str());
-    if (source_file.is_open()) {
-      std::string line;
-      while (source_file >> line) {
-	root_filenames_.push_back(line);
-      }
-    } else {
-      LOG(FATAL) << "Failed to open source file: " << source;
-    }
-    source_file.close();
+    LOG(INFO) << "Loading ROOT file " << source;
+
+    root_filenames_.push_back(source);
+    
+    // root_filenames_.clear();
+    // std::ifstream source_file(source.c_str());
+    // if (source_file.is_open()) {
+    //   std::string line;
+    //   while (source_file >> line) {
+    // 	root_filenames_.push_back(line);
+    //   }
+    // } else {
+    //   LOG(FATAL) << "Failed to open source file: " << source;
+    // }
+    // source_file.close();
     num_files_ = root_filenames_.size();
     current_file_ = 0;
     LOG(INFO) << "Number of ROOT files: " << num_files_;
     CHECK_GE(num_files_, 1) << "Must have at least 1 ROOT filename listed in "
-			    << source;
+    			    << source;
 
     file_permutation_.clear();
     file_permutation_.resize(num_files_);

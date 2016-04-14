@@ -27,20 +27,32 @@ namespace caffe {
     // _iom.set_verbosity(::larcv::msg::kDEBUG);
     _iom.add_in_file(filename);
     _iom.initialize();
+
+
+    root_helper rh;
     
     int top_size = this->layer_param_.top_size();
     root_blobs_.resize(top_size);
-    const int MIN_DATA_DIM = 1;
-    const int MAX_DATA_DIM = INT_MAX;
 
     // should only be size 2 data and label, but user 
     // could put then in any order...
     for (int i = 0; i < top_size; ++i) 
       
       root_blobs_[i] = shared_ptr<Blob<Dtype> >(new Blob<Dtype>());
-    
-    root_load_data(&_iom,
-		   this->layer_param_.root_data_param().producer(),
+
+    rh.iom = & _iom;
+    rh.producer = this->layer_param_.root_data_param().producer();
+
+    rh.imin = this->layer_param_.root_data_param().imin();
+    rh.imax = this->layer_param_.root_data_param().imax();
+
+    std::vector<float> immeans = { this->layer_param_.root_data_param().ch0_mean(),
+				    this->layer_param_.root_data_param().ch1_mean(),
+				    this->layer_param_.root_data_param().ch2_mean() };
+
+    rh.img_means = immeans;
+
+    root_load_data(rh,
 		   root_blobs_[0].get(),
 		   root_blobs_[1].get());
     

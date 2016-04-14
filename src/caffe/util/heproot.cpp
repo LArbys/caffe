@@ -1,4 +1,4 @@
-#include "caffe/util/root.hpp"
+#include "caffe/util/heproot.hpp"
 
 #include <string>
 #include <vector>

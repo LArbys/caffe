@@ -20,7 +20,8 @@ namespace caffe {
     
     std::string producer;
     bool background;
-
+    int nentries;
+    
     std::vector<float> img_means;
     float imin;
     float imax;

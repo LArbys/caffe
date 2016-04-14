@@ -101,10 +101,18 @@ namespace caffe {
     std::ifstream source_file(source.c_str());
 
     if (source_file.is_open()) {
+      std::string word1,word2;
       std::string line;
+      int c = -1;
       while (source_file >> line) {
-	LOG(INFO) << "Got source file: " << line << "\n";
-    	root_filenames_.push_back(line);
+	c+=1;
+	if (!c) word1 = line;
+	else    word2 = line;
+	
+	if ( c == 1 ) 
+	  { root_filenames_.emplace_back(word1,word2); c=-1; }
+	
+	LOG(INFO) << "Got something... " << line << "\n";
       }
     } else {
       LOG(FATAL) << "Failed to open source file: " << source;

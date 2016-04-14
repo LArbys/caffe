@@ -27,7 +27,7 @@ void ROOTDataLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
           DLOG(INFO) << "Looping around to first file.";
         }
         LoadROOTFileData(
-            root_filenames_[file_permutation_[current_file_]].c_str());
+            root_filenames_[file_permutation_[current_file_]]);
       }
       current_row_ = 0;
       if (this->layer_param_.root_data_param().shuffle())

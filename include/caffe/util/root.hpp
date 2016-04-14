@@ -15,9 +15,12 @@ namespace caffe {
 
   
   template <typename Dtype>
-  void root_load_data(::larcv::IOManager* iom,
-		      Blob<Dtype>* data_blob,
-		      Blob<Dtype>* label_blob);
+
+  void root_load_data<Dtype>(::larcv::IOManager* iom, 
+			     std::string producer,
+			     Blob<float>* data_blob,
+			     Blob<float>* label_blob);
+
   
   
 }  // namespace caffe

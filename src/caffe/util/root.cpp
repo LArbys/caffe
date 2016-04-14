@@ -7,6 +7,8 @@ namespace caffe {
   
   template <>
   void root_load_data<float>(::larcv::IOManager* iom, 
+			     std::string producer,
+			     std::vector<float>& img_means,
 			     Blob<float>* data_blob,
 			     Blob<float>* label_blob) {
     
@@ -16,8 +18,8 @@ namespace caffe {
     iom->read_entry(0);
     
     std::cout << "\t>> get ev_data\n";
-    ::larcv::EventImage2D* ev_data  = (::larcv::EventImage2D*)(iom->get_data(::larcv::kProductImage2D,"event_image"));
-    ::larcv::EventROI*     roi_data = (::larcv::EventROI*)    (iom->get_data(::larcv::kProductROI    ,"event_roi"));
+    ::larcv::EventImage2D* ev_data  = (::larcv::EventImage2D*)(iom->get_data(::larcv::kProductImage2D,producer));
+    ::larcv::EventROI*     roi_data = (::larcv::EventROI*)    (iom->get_data(::larcv::kProductROI    ,producer));
     
     std::cout << "\t>> load dn_data_set_helper\n";
     //load data dimensions and reshape the data_blob
@@ -32,7 +34,7 @@ namespace caffe {
     data_dims[0]  = nentries; data_dims[1]  = 3; data_dims[2]  = meta.rows(); data_dims[3]  = meta.cols();
     label_dims[0] = nentries;
    
-    data_blob->Reshape (data_dims);   
+    data_blob-> Reshape(data_dims);   
     label_blob->Reshape(label_dims);
 
 
@@ -49,15 +51,17 @@ namespace caffe {
     for(int entry = 0; entry < nentries; ++entry ) {
 
       iom->read_entry(entry);
-      ev_data  = (::larcv::EventImage2D*)(iom->get_data(::larcv::kProductImage2D,"event_image"));
-      roi_data = (::larcv::EventROI*)    (iom->get_data(::larcv::kProductROI    ,"event_roi"));
+      ev_data  = (::larcv::EventImage2D*)(iom->get_data(::larcv::kProductImage2D,producer));
+      roi_data = (::larcv::EventROI*)    (iom->get_data(::larcv::kProductROI    ,producer));
       
       std::cout << "\t>> LOADING ENTRY: " << entry << "\n";
 
-      label[ entry ] = ( float ) roi_data->at(0).Type(); //float is o.k. ?
+      label[ entry ] = ( float ) roi_data->at(0).Type(); //float is o.k ?
       
       auto const& imgs = ev_data->Image2DArray();
-    
+      
+      //std::vector<float> means = {167.9375,85.0346,0.0600}; //hand calculated for now
+
       for(size_t ch=0;ch<nchannels;++ch) {
 	//std::cout << "CH: " << ch << "\n";
 	
@@ -65,13 +69,12 @@ namespace caffe {
 	size_t len = v.size();
 
 	for(size_t j=0;j<len;++j)  {
-	  data[ ( entry * nchannels + ch)*len + j ] = v[j];
+	  data[ ( entry * nchannels + ch)*len + j ] = v[j] - img_means[ch];
 	  //std::cout << v[j] << " ";
 
 	  //if ( j%10 == 0 && j != 0) std::cout << "\n";
 
 	}
-
 	//std::cout << "\n";
       }
 
@@ -85,8 +88,10 @@ namespace caffe {
     
   }
 
+
   template <>
   void root_load_data<double>(::larcv::IOManager* iom, 
+			     std::string producer,
 			     Blob<double>* data_blob,
 			     Blob<double>* label_blob) {
     
@@ -96,8 +101,8 @@ namespace caffe {
     iom->read_entry(0);
     
     std::cout << "\t>> get ev_data\n";
-    ::larcv::EventImage2D* ev_data  = (::larcv::EventImage2D*)(iom->get_data(::larcv::kProductImage2D,"event_image"));
-    ::larcv::EventROI*     roi_data = (::larcv::EventROI*)    (iom->get_data(::larcv::kProductROI    ,"event_roi"));
+    ::larcv::EventImage2D* ev_data  = (::larcv::EventImage2D*)(iom->get_data(::larcv::kProductImage2D,producer));
+    ::larcv::EventROI*     roi_data = (::larcv::EventROI*)    (iom->get_data(::larcv::kProductROI    ,producer));
     
     std::cout << "\t>> load dn_data_set_helper\n";
     //load data dimensions and reshape the data_blob
@@ -112,7 +117,7 @@ namespace caffe {
     data_dims[0]  = nentries; data_dims[1]  = 3; data_dims[2]  = meta.rows(); data_dims[3]  = meta.cols();
     label_dims[0] = nentries;
    
-    data_blob->Reshape (data_dims);   
+    data_blob-> Reshape(data_dims);   
     label_blob->Reshape(label_dims);
 
 
@@ -129,15 +134,17 @@ namespace caffe {
     for(int entry = 0; entry < nentries; ++entry ) {
 
       iom->read_entry(entry);
-      ev_data  = (::larcv::EventImage2D*)(iom->get_data(::larcv::kProductImage2D,"event_image"));
-      roi_data = (::larcv::EventROI*)    (iom->get_data(::larcv::kProductROI    ,"event_roi"));
+      ev_data  = (::larcv::EventImage2D*)(iom->get_data(::larcv::kProductImage2D,producer));
+      roi_data = (::larcv::EventROI*)    (iom->get_data(::larcv::kProductROI    ,producer));
       
       std::cout << "\t>> LOADING ENTRY: " << entry << "\n";
 
-      label[ entry ] = ( double ) roi_data->at(0).Type(); //double is o.k. ?
+      label[ entry ] = ( float ) roi_data->at(0).Type(); //float is o.k ?
       
       auto const& imgs = ev_data->Image2DArray();
-    
+      
+      std::vector<double> means = {167.9375,85.0346,0.0600}; //hand calculated for now
+
       for(size_t ch=0;ch<nchannels;++ch) {
 	//std::cout << "CH: " << ch << "\n";
 	
@@ -145,7 +152,7 @@ namespace caffe {
 	size_t len = v.size();
 
 	for(size_t j=0;j<len;++j)  {
-	  data[ ( entry * nchannels + ch)*len + j ] = v[j];
+	  data[ ( entry * nchannels + ch)*len + j ] = v[j] - means[ch];
 	  //std::cout << v[j] << " ";
 
 	  //if ( j%10 == 0 && j != 0) std::cout << "\n";
@@ -164,5 +171,6 @@ namespace caffe {
     memcpy(label_blob->mutable_cpu_data(),label.data(),label.size() * sizeof(double) );
     
   }
+
 
 }  // namespace caffe

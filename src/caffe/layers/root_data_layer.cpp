@@ -39,8 +39,8 @@ namespace caffe {
       
       root_blobs_[i] = shared_ptr<Blob<Dtype> >(new Blob<Dtype>());
     
-    
     root_load_data(&_iom,
+		   this->layer_param_.root_data_param().producer(),
 		   root_blobs_[0].get(),
 		   root_blobs_[1].get());
     
@@ -91,6 +91,7 @@ namespace caffe {
     //   LOG(FATAL) << "Failed to open source file: " << source;
     // }
     // source_file.close();
+
     num_files_ = root_filenames_.size();
     current_file_ = 0;
     LOG(INFO) << "Number of ROOT files: " << num_files_;

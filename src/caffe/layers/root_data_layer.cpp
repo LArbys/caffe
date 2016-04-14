@@ -12,7 +12,7 @@
 
 //
 #include "caffe/layers/root_data_layer.hpp"
-#include "caffe/util/root.hpp"
+#include "caffe/util/heproot.hpp"
 
 namespace caffe {
   
@@ -21,35 +21,41 @@ namespace caffe {
   
   // Load data and label from ROOT filename into the class property blobs.
   template <typename Dtype>
-  void ROOTDataLayer<Dtype>::LoadROOTFileData(const char* filename) {
-    std::cout << "Loading ROOT file: " << filename;
+  void ROOTDataLayer<Dtype>::LoadROOTFileData(std::pair<std::string,std::string>& file_producer) {
 
+    auto& filename = file_producer.first;
+    auto& producer = file_producer.second;
+    LOG(INFO) << "Loading ROOT file: " << filename << " with producer: " << producer << "\n";
+    
     // _iom.set_verbosity(::larcv::msg::kDEBUG);
+
     _iom.add_in_file(filename);
     _iom.initialize();
-
 
     root_helper rh;
     
     int top_size = this->layer_param_.top_size();
     root_blobs_.resize(top_size);
 
-    // should only be size 2 data and label, but user 
-    // could put then in any order...
+    // should only be size 2: data and label, but user 
+    // could put them in any order...
     for (int i = 0; i < top_size; ++i) 
       
       root_blobs_[i] = shared_ptr<Blob<Dtype> >(new Blob<Dtype>());
 
     rh.iom = & _iom;
-    rh.producer = this->layer_param_.root_data_param().producer();
-
+    rh.producer   = producer;
+    rh.background = producer == "data" ? true : false;
+    
+    rh.nentries = this->layer_param_.root_data_param().nentries();
+    
     rh.imin = this->layer_param_.root_data_param().imin();
     rh.imax = this->layer_param_.root_data_param().imax();
-
+    
     std::vector<float> immeans = { this->layer_param_.root_data_param().ch0_mean(),
-				    this->layer_param_.root_data_param().ch1_mean(),
-				    this->layer_param_.root_data_param().ch2_mean() };
-
+				   this->layer_param_.root_data_param().ch1_mean(),
+				   this->layer_param_.root_data_param().ch2_mean() };
+    
     rh.img_means = immeans;
 
     root_load_data(rh,
@@ -88,34 +94,37 @@ namespace caffe {
       this->type() << " does not transform data.";
     // Read the source to parse the filenames.
     const string& source = this->layer_param_.root_data_param().source();
-    LOG(INFO) << "Loading ROOT file " << source;
 
-    root_filenames_.push_back(source);
-    
-    // root_filenames_.clear();
-    // std::ifstream source_file(source.c_str());
-    // if (source_file.is_open()) {
-    //   std::string line;
-    //   while (source_file >> line) {
-    // 	root_filenames_.push_back(line);
-    //   }
-    // } else {
-    //   LOG(FATAL) << "Failed to open source file: " << source;
-    // }
-    // source_file.close();
+    root_filenames_.clear();
+
+    LOG(INFO) << "Loading ROOT file list and producers" << source;
+    std::ifstream source_file(source.c_str());
+
+    if (source_file.is_open()) {
+      std::string line;
+      while (source_file >> line) {
+	LOG(INFO) << "Got source file: " << line << "\n";
+    	root_filenames_.push_back(line);
+      }
+    } else {
+      LOG(FATAL) << "Failed to open source file: " << source;
+
+    }
+    source_file.close();
 
     num_files_ = root_filenames_.size();
     current_file_ = 0;
-    LOG(INFO) << "Number of ROOT files: " << num_files_;
+    LOG(INFO) << "Number of ROOT files:     " << num_files_;
+
     CHECK_GE(num_files_, 1) << "Must have at least 1 ROOT filename listed in "
     			    << source;
-
+    
     file_permutation_.clear();
     file_permutation_.resize(num_files_);
     // Default to identity permutation.
-    for (int i = 0; i < num_files_; i++) {
+    for (int i = 0; i < num_files_; i++)
       file_permutation_[i] = i;
-    }
+    
 
     // Shuffle if needed.
     if (this->layer_param_.root_data_param().shuffle()) {
@@ -123,7 +132,7 @@ namespace caffe {
     }
 
     // Load the first ROOT file and initialize the line counter.
-    LoadROOTFileData(root_filenames_[file_permutation_[current_file_]].c_str());
+    LoadROOTFileData(root_filenames_[file_permutation_[current_file_]]);
     current_row_ = 0;
 
     // Reshape blobs.
@@ -157,7 +166,7 @@ namespace caffe {
 	    }
 	    DLOG(INFO) << "Looping around to first file.";
 	  }
-	  LoadROOTFileData(root_filenames_[file_permutation_[current_file_]].c_str());
+	  LoadROOTFileData(root_filenames_[file_permutation_[current_file_]]);
 	}
 	
 	

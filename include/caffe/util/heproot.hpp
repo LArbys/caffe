@@ -19,10 +19,12 @@ namespace caffe {
     ::larcv::IOManager* iom;
     
     std::string producer;
-    
+    bool background;
+
     std::vector<float> img_means;
     float imin;
     float imax;
+
   };
   
   template <typename Dtype>

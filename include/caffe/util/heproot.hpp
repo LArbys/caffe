@@ -3,11 +3,6 @@
 
 #include <string>
 
-//LArCV
-#include "DataFormat/IOManager.h"
-#include "DataFormat/EventImage2D.h"
-#include "DataFormat/EventROI.h"
-
 //Caffe
 #include "caffe/blob.hpp"
 
@@ -16,8 +11,8 @@ namespace caffe {
 
   struct root_helper  {
 
-    ::larcv::IOManager* iom;
-    
+    //::larcv::IOManager* iom;
+    std::string filename;
     std::string producer;
     bool background;
     int nentries;

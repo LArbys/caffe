@@ -29,6 +29,8 @@ void ROOTDataLayer<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom,
         LoadROOTFileData(
             root_filenames_[file_permutation_[current_file_]]);
       }
+        LoadROOTFileData(
+            root_filenames_[file_permutation_[current_file_]]);
       current_row_ = 0;
       if (this->layer_param_.root_data_param().shuffle())
         std::random_shuffle(data_permutation_.begin(), data_permutation_.end());

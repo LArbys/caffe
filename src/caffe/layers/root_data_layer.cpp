@@ -9,7 +9,8 @@
 
 // LArCV
 #include "DataFormat/IOManager.h"
-
+#include "DataFormat/EventROI.h"
+#include "DataFormat/EventImage2D.h"
 //
 #include "caffe/layers/root_data_layer.hpp"
 #include "caffe/util/heproot.hpp"
@@ -17,14 +18,14 @@
 namespace caffe {
   
   template <typename Dtype>
-  ROOTDataLayer<Dtype>::~ROOTDataLayer<Dtype>() { _iom.finalize(); }
+  ROOTDataLayer<Dtype>::~ROOTDataLayer<Dtype>() {}//{ _iom.finalize(); }
   
   // Load data and label from ROOT filename into the class property blobs.
   template <typename Dtype>
   void ROOTDataLayer<Dtype>::LoadROOTFileData(std::pair<std::string,std::string>& file_producer) {
 
     auto& producer = file_producer.second;
-
+    /*
     static bool iom_initialized=false;
     if(!iom_initialized) {
       // _iom.set_verbosity(::larcv::msg::kDEBUG);
@@ -32,7 +33,9 @@ namespace caffe {
       LOG(INFO) << "Loading ROOT file: " << filename << " with producer: " << producer << "\n";
       _iom.add_in_file(filename);
       _iom.initialize();
+      iom_initialized=true;
     }
+    */
     root_helper rh;
     
     int top_size = this->layer_param_.top_size();
@@ -44,8 +47,9 @@ namespace caffe {
       
       root_blobs_[i] = shared_ptr<Blob<Dtype> >(new Blob<Dtype>());
 
-    rh.iom = & _iom;
-    rh.producer   = producer;
+    //rh.iom = & _iom;
+    rh.filename = file_producer.first;
+    rh.producer = producer;
     //rh.background = producer == "data" ? true : false;
     rh.background = true;
 
@@ -57,7 +61,7 @@ namespace caffe {
     std::string mean_img_fname = this->layer_param_.root_data_param().mean();
 
     if(_mean_imgs.empty() && !mean_img_fname.empty()) {
-      ::larcv::IOManager mean_io(::larcv::IOManager::kREAD);
+      ::larcv::IOManager mean_io(::larcv::IOManager::kREAD,"IOMean");
       mean_io.add_in_file(this->layer_param_.root_data_param().mean());
       mean_io.initialize();
       mean_io.read_entry(0);
@@ -67,6 +71,7 @@ namespace caffe {
       for(auto const& img2d : mean_img->Image2DArray())
 
 	_mean_imgs.push_back(img2d.as_vector());
+      mean_io.finalize();
     }
 
     rh.mean_imgs = _mean_imgs;

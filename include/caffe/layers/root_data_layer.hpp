@@ -10,8 +10,6 @@
 
 #include "caffe/layers/base_data_layer.hpp"
 
-#include "DataFormat/IOManager.h"
-
 namespace caffe {
 
   /**
@@ -24,7 +22,8 @@ namespace caffe {
 
   public:
     explicit ROOTDataLayer(const LayerParameter& param)
-      : Layer<Dtype>(param) , _iom() , _mean_imgs() {}
+    //: Layer<Dtype>(param) , _iom(::larcv::IOManager::kREAD,"IOData") , _mean_imgs() {}
+      : Layer<Dtype>(param) , _mean_imgs() {}
 
     virtual ~ROOTDataLayer();
 
@@ -63,7 +62,7 @@ namespace caffe {
     std::vector<unsigned int> data_permutation_;
     std::vector<unsigned int> file_permutation_;
     
-    ::larcv::IOManager _iom;
+    //::larcv::IOManager _iom;
     std::vector<std::vector<float> > _mean_imgs;
     
   };

@@ -17,21 +17,22 @@
 namespace caffe {
   
   template <typename Dtype>
-  ROOTDataLayer<Dtype>::~ROOTDataLayer<Dtype>() { }
+  ROOTDataLayer<Dtype>::~ROOTDataLayer<Dtype>() { _iom.finalize(); }
   
   // Load data and label from ROOT filename into the class property blobs.
   template <typename Dtype>
   void ROOTDataLayer<Dtype>::LoadROOTFileData(std::pair<std::string,std::string>& file_producer) {
 
-    auto& filename = file_producer.first;
     auto& producer = file_producer.second;
-    LOG(INFO) << "Loading ROOT file: " << filename << " with producer: " << producer << "\n";
-    
-    // _iom.set_verbosity(::larcv::msg::kDEBUG);
 
-    _iom.add_in_file(filename);
-    _iom.initialize();
-
+    static bool iom_initialized=false;
+    if(!iom_initialized) {
+      // _iom.set_verbosity(::larcv::msg::kDEBUG);
+      auto& filename = file_producer.first;
+      LOG(INFO) << "Loading ROOT file: " << filename << " with producer: " << producer << "\n";
+      _iom.add_in_file(filename);
+      _iom.initialize();
+    }
     root_helper rh;
     
     int top_size = this->layer_param_.top_size();
@@ -45,25 +46,42 @@ namespace caffe {
 
     rh.iom = & _iom;
     rh.producer   = producer;
-    rh.background = producer == "data" ? true : false;
-    
+    //rh.background = producer == "data" ? true : false;
+    rh.background = true;
+
     rh.nentries = this->layer_param_.root_data_param().nentries();
     
     rh.imin = this->layer_param_.root_data_param().imin();
     rh.imax = this->layer_param_.root_data_param().imax();
-    
-    std::vector<float> immeans = { this->layer_param_.root_data_param().ch0_mean(),
-				   this->layer_param_.root_data_param().ch1_mean(),
-				   this->layer_param_.root_data_param().ch2_mean() };
-    
-    rh.img_means = immeans;
+
+    std::string mean_img_fname = this->layer_param_.root_data_param().mean();
+
+    if(_mean_imgs.empty() && !mean_img_fname.empty()) {
+      ::larcv::IOManager mean_io(::larcv::IOManager::kREAD);
+      mean_io.add_in_file(this->layer_param_.root_data_param().mean());
+      mean_io.initialize();
+      mean_io.read_entry(0);
+      auto mean_img = (::larcv::EventImage2D*)(mean_io.get_data(::larcv::kProductImage2D,
+								this->layer_param_.root_data_param().mean_producer()));
+      
+      for(auto const& img2d : mean_img->Image2DArray())
+
+	_mean_imgs.push_back(img2d.as_vector());
+    }
+
+    rh.mean_imgs = _mean_imgs;
+
+    if(_mean_imgs.empty()) {
+      std::vector<float> immeans = { this->layer_param_.root_data_param().ch0_mean(),
+				     this->layer_param_.root_data_param().ch1_mean(),
+				     this->layer_param_.root_data_param().ch2_mean() };
+      rh.img_means = immeans;
+    }
 
     root_load_data(rh,
 		   root_blobs_[0].get(),
 		   root_blobs_[1].get());
     
-    _iom.finalize();
-
     // MinTopBlobs==1 guarantees at least one top blob
     CHECK_GE(root_blobs_[0]->num_axes(), 1) << "Input must have at least 1 axis.";
     const int num = root_blobs_[0]->shape(0);
@@ -177,7 +195,7 @@ namespace caffe {
 	  LoadROOTFileData(root_filenames_[file_permutation_[current_file_]]);
 	}
 	
-	
+	LoadROOTFileData(root_filenames_[file_permutation_[current_file_]]);	
 	current_row_ = 0;
 	if (this->layer_param_.root_data_param().shuffle())
 	  std::random_shuffle(data_permutation_.begin(), data_permutation_.end());
@@ -192,6 +210,42 @@ namespace caffe {
     }
   }
 
+  /*
+  template <typename Dtype>
+  void ROOTDataLayer<Dtype>::Forward_cpu(const vector<Blob<Dtype>*>& bottom,
+					 const vector<Blob<Dtype>*>& top) {
+    const int batch_size = this->layer_param_.root_data_param().batch_size();
+    for (int i = 0; i < batch_size; ++i, ++current_row_) {
+      if (current_row_ == root_blobs_[0]->shape(0)) {
+	
+	if (num_files_ > 1) {
+	  ++current_file_;
+	  if (current_file_ == num_files_) {
+	    current_file_ = 0;
+	    if (this->layer_param_.root_data_param().shuffle()) {
+	      std::random_shuffle(file_permutation_.begin(),
+				  file_permutation_.end());
+	    }
+	    DLOG(INFO) << "Looping around to first file.";
+	  }
+	  LoadROOTFileData(root_filenames_[file_permutation_[current_file_]]);
+	}
+	
+	
+	current_row_ = 0;
+	if (this->layer_param_.root_data_param().shuffle())
+	  std::random_shuffle(data_permutation_.begin(), data_permutation_.end());
+	
+      }
+      for (int j = 0; j < this->layer_param_.top_size(); ++j) {
+	int data_dim = top[j]->count() / top[j]->shape(0);
+	caffe_copy(data_dim,
+		   &root_blobs_[j]->cpu_data()[data_permutation_[current_row_]
+					       * data_dim], &top[j]->mutable_cpu_data()[i * data_dim]);
+      }
+    }
+  }
+  */
 #ifdef CPU_ONLY
   STUB_GPU_FORWARD(ROOTDataLayer, Forward);
 #endif

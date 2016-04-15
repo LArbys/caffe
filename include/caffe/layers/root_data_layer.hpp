@@ -24,7 +24,7 @@ namespace caffe {
 
   public:
     explicit ROOTDataLayer(const LayerParameter& param)
-      : Layer<Dtype>(param) , _iom() {}
+      : Layer<Dtype>(param) , _iom() , _mean_imgs() {}
 
     virtual ~ROOTDataLayer();
 
@@ -64,6 +64,7 @@ namespace caffe {
     std::vector<unsigned int> file_permutation_;
     
     ::larcv::IOManager _iom;
+    std::vector<std::vector<float> > _mean_imgs;
     
   };
 

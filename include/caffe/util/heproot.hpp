@@ -23,6 +23,7 @@ namespace caffe {
     int nentries;
     
     std::vector<float> img_means;
+    std::vector<std::vector<float> > mean_imgs;
     float imin;
     float imax;
 

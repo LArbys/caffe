@@ -102,11 +102,12 @@ namespace caffe {
     // Shuffle if needed.
     if (this->layer_param_.root_data_param().shuffle()) {
       std::random_shuffle(data_permutation_.begin(), data_permutation_.end());
+      /*
       DLOG(INFO) << "Successully loaded " << root_blobs_[0]->shape(0)
 		 << " rows (shuffled)";
-    } else {
-      DLOG(INFO) << "Successully loaded " << root_blobs_[0]->shape(0) << " rows";
-    }
+      */
+    } 
+    //else { DLOG(INFO) << "Successully loaded " << root_blobs_[0]->shape(0) << " rows"; }
   }
 
   template <typename Dtype>

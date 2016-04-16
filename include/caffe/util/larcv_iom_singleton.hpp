@@ -10,14 +10,16 @@ namespace larcv {
     ~SingleIOManager(){ manager.finalize(); }
     
     static SingleIOManager& get(const std::string& fname) { 
-      if(!_me) _me = new SingleIOManager(fname);
-      return *_me;
+      auto iter = _siom_m.find(fname);
+      if(iter != _siom_m.end()) return (*((*iter).second));
+      _siom_m[fname] = new SingleIOManager(fname);
+      return (*(_siom_m[fname]));
     }
-
+    
     IOManager manager;
 
   private:
-    static SingleIOManager* _me;
+    static std::map<std::string,larcv::SingleIOManager*> _siom_m;
 
   };
 }

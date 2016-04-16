@@ -179,6 +179,7 @@ namespace caffe {
       }
     }
     //iom.finalize();
+    /*
     LOG(INFO) << "\t>> memcpy with data.size() " << data.size() 
 	      << " with memory size " << data.size() * sizeof(float)  << "\n";
     memcpy(data_blob->mutable_cpu_data(),data.data(),data.size() * sizeof(float) );
@@ -186,7 +187,7 @@ namespace caffe {
     LOG(INFO) << "\t>> memcpy with label.size() " << label.size() 
 	      << " with memory size " << label.size() * sizeof(float)  << "\n";
     memcpy(label_blob->mutable_cpu_data(),label.data(),label.size() * sizeof(float) );
-    
+    */    
   }
 
   template <>

@@ -111,9 +111,11 @@ namespace caffe {
     //::larcv::IOManager iom(::larcv::IOManager::kREAD,"IOData");
     //iom.add_in_file(rh.filename);
     //iom.initialize();
+    LOG(INFO) << "Getting singleton";
     auto& iom = ::larcv::SingleIOManager::get(rh.filename).manager;
+    //iom.set_verbosity(::larcv::msg::kDEBUG);
+    LOG(INFO) << "Entry 0";
     iom.read_entry(0);
-    
     auto ev_data = (::larcv::EventImage2D*)(iom.get_data(::larcv::kProductImage2D,rh.producer));
 
     bool background = rh.background;
@@ -133,20 +135,21 @@ namespace caffe {
     data_dims[3]  = meta.cols();
     
     label_dims[0] = nentries;
-   
-    data_blob->Reshape(data_dims);   
+    LOG(INFO) << "Reshape data";    
+    data_blob->Reshape(data_dims);  
+    LOG(INFO) << "Reshape label";     
     label_blob->Reshape(label_dims);
 
     int nchannels = im.size();
-
+    LOG(INFO) << "Resize data";    
     std::vector<float> data; 
     data.resize(nentries * nchannels * im[0].as_vector().size() );
-
+    LOG(INFO) << "Resize label";    
     std::vector<float> label; 
     label.resize( nentries );
 
     bool use_flat_mean = rh.mean_imgs.empty();
-
+    LOG(INFO) << "Reading nentries: " << nentries;
     for(int entry = 0; entry < nentries; ++entry ) {
 
       iom.read_entry(random_entry(iom.get_n_entries()));
@@ -179,15 +182,14 @@ namespace caffe {
       }
     }
     //iom.finalize();
-    /*
+    
     LOG(INFO) << "\t>> memcpy with data.size() " << data.size() 
-	      << " with memory size " << data.size() * sizeof(float)  << "\n";
+    	      << " with memory size " << data.size() * sizeof(float)  << "\n";
     memcpy(data_blob->mutable_cpu_data(),data.data(),data.size() * sizeof(float) );
     
     LOG(INFO) << "\t>> memcpy with label.size() " << label.size() 
-	      << " with memory size " << label.size() * sizeof(float)  << "\n";
-    memcpy(label_blob->mutable_cpu_data(),label.data(),label.size() * sizeof(float) );
-    */    
+    	      << " with memory size " << label.size() * sizeof(float)  << "\n";
+    memcpy(label_blob->mutable_cpu_data(),label.data(),label.size() * sizeof(float) );    
   }
 
   template <>
@@ -266,15 +268,13 @@ namespace caffe {
       }
     }
     iom.finalize();
-    /*
+    
     LOG(INFO) << "\t>> memcpy with data.size() " << data.size() 
-	      << " with memory size " << data.size() * sizeof(double)  << "\n";
-    */
+	      << " with memory size " << data.size() * sizeof(double)  << " (double)\n";
     memcpy(data_blob->mutable_cpu_data(),data.data(),data.size() * sizeof(double) );
-    /*
+    
     LOG(INFO) << "\t>> memcpy with label.size() " << label.size() 
-	      << " with memory size " << label.size() * sizeof(double)  << "\n";
-    */
+	      << " with memory size " << label.size() * sizeof(double)  << " (double)\n";
     memcpy(label_blob->mutable_cpu_data(),label.data(),label.size() * sizeof(double) );
     
   }

@@ -13,15 +13,14 @@ namespace caffe {
 
     //::larcv::IOManager* iom;
     std::string filename;
-    std::string producer;
-    bool background;
+    std::string image_producer;
+    std::string roi_producer;
     int nentries;
     
     std::vector<float> img_means;
     std::vector<std::vector<float> > mean_imgs;
-    float imin;
-    float imax;
-
+    std::vector<float> imin_v;
+    std::vector<float> imax_v;
   };
   
   template <typename Dtype>

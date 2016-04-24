@@ -50,9 +50,9 @@ namespace caffe {
 			      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {}
     virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
 			      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {}
-    virtual void LoadROOTFileData(std::pair<std::string,std::string>& file_producer);
+    virtual void LoadROOTFileData(const std::string& file_producer);
     
-    std::vector<std::pair<std::string,std::string> > root_filenames_;
+    std::vector<std::string> root_filenames_;
     
     unsigned int num_files_;
     unsigned int current_file_;

@@ -22,21 +22,11 @@ namespace caffe {
   
   // Load data and label from ROOT filename into the class property blobs.
   template <typename Dtype>
-  void ROOTDataLayer<Dtype>::LoadROOTFileData(std::pair<std::string,std::string>& file_producer) {
+  void ROOTDataLayer<Dtype>::LoadROOTFileData(const std::string& filename) {
 
-    auto& producer = file_producer.second;
-    /*
-    static bool iom_initialized=false;
-    if(!iom_initialized) {
-      // _iom.set_verbosity(::larcv::msg::kDEBUG);
-      auto& filename = file_producer.first;
-      LOG(INFO) << "Loading ROOT file: " << filename << " with producer: " << producer << "\n";
-      _iom.add_in_file(filename);
-      _iom.initialize();
-      iom_initialized=true;
-    }
-    */
     root_helper rh;
+
+    rh.filename = filename;
     
     int top_size = this->layer_param_.top_size();
     root_blobs_.resize(top_size);
@@ -48,15 +38,19 @@ namespace caffe {
       root_blobs_[i] = shared_ptr<Blob<Dtype> >(new Blob<Dtype>());
 
     //rh.iom = & _iom;
-    rh.filename = file_producer.first;
-    rh.producer = producer;
-    //rh.background = producer == "data" ? true : false;
-    rh.background = true;
+    rh.image_producer = this->layer_param_.root_data_param().image_producer();
+    rh.roi_producer   = this->layer_param_.root_data_param().roi_producer();
 
     rh.nentries = this->layer_param_.root_data_param().nentries();
-    
-    rh.imin = this->layer_param_.root_data_param().imin();
-    rh.imax = this->layer_param_.root_data_param().imax();
+
+    rh.imin_v.resize(3);
+    rh.imax_v.resize(3);
+    rh.imin_v[0] = this->layer_param_.root_data_param().imin_plane0();
+    rh.imin_v[1] = this->layer_param_.root_data_param().imin_plane1();
+    rh.imin_v[2] = this->layer_param_.root_data_param().imin_plane2();
+    rh.imax_v[0] = this->layer_param_.root_data_param().imax_plane0();
+    rh.imax_v[1] = this->layer_param_.root_data_param().imax_plane1();
+    rh.imax_v[2] = this->layer_param_.root_data_param().imax_plane2();
 
     std::string mean_img_fname = this->layer_param_.root_data_param().mean();
 
@@ -123,7 +117,10 @@ namespace caffe {
 
     LOG(INFO) << "Loading ROOT file list and producers" << source;
     std::ifstream source_file(source.c_str());
-
+    std::string fname;
+    while(source_file >> fname) 
+      if(!fname.empty()) root_filenames_.push_back(fname);
+    /*
     if (source_file.is_open()) {
       std::string word1,word2;
       std::string line;
@@ -140,8 +137,8 @@ namespace caffe {
       }
     } else {
       LOG(FATAL) << "Failed to open source file: " << source;
-
     }
+    */
     source_file.close();
 
     num_files_ = root_filenames_.size();

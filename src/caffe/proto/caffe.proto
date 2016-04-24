@@ -762,7 +762,7 @@ message HDF5OutputParameter {
   optional string file_name = 1;
 }
 
-//vic
+//ROOT layer current max ### 17 ###
 message ROOTDataParameter {
   // Specify the data source.
   optional string source = 1;
@@ -770,12 +770,20 @@ message ROOTDataParameter {
   // Specify the batch size.
   optional uint32 batch_size = 2;
 
-  optional string producer = 3;
+  optional string image_producer = 3;
+
+  optional string roi_producer = 13;
    
   optional int32 nentries = 4;
   
-  optional float imin = 5;
-  optional float imax = 6;
+  optional float imin_plane0 = 5;
+  optional float imax_plane0 = 6;
+
+  optional float imin_plane1 = 14;
+  optional float imax_plane1 = 15;
+
+  optional float imin_plane2 = 16;
+  optional float imax_plane2 = 17;
 
   optional float ch0_mean = 7;
   optional float ch1_mean = 8;

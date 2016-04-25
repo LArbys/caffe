@@ -35,9 +35,11 @@ namespace caffe {
     const auto& im = ev_data->Image2DArray();
     const auto& meta = im[0].meta();
 
+    const int nchannels = im.size();
+
     std::vector<int> data_dims(4), label_dims(1);
     data_dims[0]  = nentries; 
-    data_dims[1]  = 3; 
+    data_dims[1]  = nchannels;
     data_dims[2]  = meta.rows(); 
     data_dims[3]  = meta.cols();
     
@@ -47,7 +49,6 @@ namespace caffe {
     LOG(INFO) << "Reshape label";     
     label_blob->Reshape(label_dims);
 
-    int nchannels = im.size();
     LOG(INFO) << "Resize data";    
     std::vector<float> data; 
     data.resize(nentries * nchannels * im[0].as_vector().size() );
@@ -132,9 +133,11 @@ namespace caffe {
     const auto& im = ev_data->Image2DArray();
     const auto& meta = im[0].meta();
 
+    const int nchannels = im.size();
+
     std::vector<int> data_dims(4), label_dims(1);
     data_dims[0]  = nentries; 
-    data_dims[1]  = 3; 
+    data_dims[1]  = nchannels;
     data_dims[2]  = meta.rows(); 
     data_dims[3]  = meta.cols();
     
@@ -142,8 +145,6 @@ namespace caffe {
    
     data_blob->Reshape(data_dims);   
     label_blob->Reshape(label_dims);
-
-    int nchannels = im.size();
 
     std::vector<double> data; 
     data.resize(nentries * nchannels * im[0].as_vector().size() );

@@ -57,7 +57,7 @@ namespace caffe {
 
     if(_mean_imgs.empty() && !mean_img_fname.empty()) {
       ::larcv::IOManager mean_io(::larcv::IOManager::kREAD,"IOMean");
-      mean_io.add_in_file(this->layer_param_.root_data_param().mean());
+      mean_io.add_in_file(mean_img_fname);
       mean_io.initialize();
       mean_io.read_entry(0);
       auto mean_img = (::larcv::EventImage2D*)(mean_io.get_data(::larcv::kProductImage2D,
@@ -66,15 +66,14 @@ namespace caffe {
       for(auto const& img2d : mean_img->Image2DArray())
 
 	_mean_imgs.push_back(img2d.as_vector());
+
       mean_io.finalize();
     }
 
     rh.mean_imgs = _mean_imgs;
 
     if(_mean_imgs.empty()) {
-      std::vector<float> immeans = { this->layer_param_.root_data_param().ch0_mean(),
-				     this->layer_param_.root_data_param().ch1_mean(),
-				     this->layer_param_.root_data_param().ch2_mean() };
+      std::vector<float> immeans = ::larcv::parser::FromString<std::vector<float> >(this->layer_param_.root_data_param().flat_mean());
       rh.img_means = immeans;
     }
 

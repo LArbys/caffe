@@ -762,7 +762,7 @@ message HDF5OutputParameter {
   optional string file_name = 1;
 }
 
-//ROOT layer current max ### 17 ###
+//ROOT layer current max ### 15 ###
 message ROOTDataParameter {
   // Specify the data source.
   optional string source = 1;
@@ -772,32 +772,30 @@ message ROOTDataParameter {
 
   optional string image_producer = 3;
 
-  optional string roi_producer = 13;
+  optional string roi_producer = 11;
    
   optional int32 nentries = 4;
   
   optional string imin = 5;
   optional string imax = 6;
 
-  optional float ch0_mean = 7;
-  optional float ch1_mean = 8;
-  optional float ch2_mean = 9;
+  optional string flat_mean = 7;
 
-  optional float random_adc_scale_mean = 14;
-  optional float random_adc_scale_sigma = 15;
+  optional float random_adc_scale_mean = 12;
+  optional float random_adc_scale_sigma = 13;
 
-  optional uint32 random_row_pad = 26;
-  optional uint32 random_col_pad = 27;
+  optional uint32 random_row_pad = 14;
+  optional uint32 random_col_pad = 15;
 
   // Specify whether to shuffle the data.
   // If shuffle == true, the ordering of the ROOT files is shuffled,
   // and the ordering of data within any given ROOT file is shuffled,
   // but data between different files are not interleaved; all of a file's
   // data are output (in a random order) before moving onto another file.
-  optional bool shuffle = 10 [default = false];
+  optional bool shuffle = 8 [default = false];
 
-  optional string mean = 11;
-  optional string mean_producer = 12;
+  optional string mean = 9;
+  optional string mean_producer = 10;
 }
 
 

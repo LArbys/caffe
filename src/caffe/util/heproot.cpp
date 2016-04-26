@@ -33,7 +33,7 @@ namespace caffe {
 
     const ::larcv::ProducerID_t image_producer_id = iom.producer_id(::larcv::kProductImage2D,rh.image_producer);
     const ::larcv::ProducerID_t roi_producer_id = iom.producer_id(::larcv::kProductROI,rh.roi_producer);
-    auto ev_data = (::larcv::EventImage2D*)(iom.get_data(image_producer_id));
+    auto const ev_data = (::larcv::EventImage2D*)(iom.get_data(image_producer_id));
 
     //load data dimensions and reshape the data_blob
 
@@ -48,6 +48,37 @@ namespace caffe {
 
     const int nchannels = im.size();
 
+    //
+    // Sanity check
+    //
+    if(rh.mean_imgs.empty() && rh.img_means.empty()) {
+      LOG(ERROR) << "\t Neither mean image nor mean image channel means provided!\n";
+      throw std::exception();
+    }
+    if(rh.mean_imgs.size() && rh.mean_imgs.size() != nchannels) {
+      LOG(ERROR) << "\t Mean image # channels = " << rh.mean_imgs.size() 
+		 << " ... do not match with data (" << nchannels << ") !\n";
+      throw std::exception();
+    }
+    if(rh.img_means.size() && rh.img_means.size() != nchannels) {
+      LOG(ERROR) << "\t Image mean # channels = " << rh.img_means.size()
+		 << " ... do not match with data (" << nchannels << ") !\n";
+      throw std::exception();
+    }
+    if(rh.imin_v.size() != nchannels) {
+      LOG(ERROR) << "\t ADC minimum value array (imin) has length " << rh.imin_v.size()
+		 << " which is smaller than # channels (" << nchannels << ") !\n";
+      throw std::exception();
+    }
+    if(rh.imax_v.size() != nchannels) {
+      LOG(ERROR) << "\t ADC minimum value array (imax) has length " << rh.imax_v.size()
+		 << " which is smaller than # channels (" << nchannels << ") !\n";
+      throw std::exception();
+    }
+
+    //
+    // Define blob dimension
+    //
     std::vector<int> data_dims(4), label_dims(1);
     data_dims[0]  = nentries; 
     data_dims[1]  = nchannels;
@@ -83,9 +114,19 @@ namespace caffe {
 
     bool use_flat_mean = rh.mean_imgs.empty();
     LOG(INFO) << "Reading nentries: " << nentries;
+
+    size_t last_entry = ::larcv::kINVALID_SIZE;
+
     for(int entry = 0; entry < nentries; ++entry ) {
       float adc_scale_factor = (float)(adc_scale_v[entry]);
-      iom.read_entry(random_size(iom.get_n_entries()));
+
+      size_t random_entry = random_size(iom.get_n_entries());
+      while(random_entry == last_entry)
+	random_entry = random_size(iom.get_n_entries());
+      
+      last_entry = random_entry;
+
+      iom.read_entry(random_entry);
 
       label[entry] = 1; // Neutrino by default
       ++nu_count;
@@ -99,9 +140,9 @@ namespace caffe {
 	}
       }
 
-      ev_data  = (::larcv::EventImage2D*)(iom.get_data(image_producer_id));
+      auto input_images  = (::larcv::EventImage2D*)(iom.get_data(image_producer_id));
       std::vector<larcv::Image2D> input_img_v;
-      ev_data->Move(input_img_v);
+      input_images->Move(input_img_v);
 
       size_t row_shift = ( row_pad ? random_size(row_pad) : 0 );
       size_t col_shift = ( col_pad ? random_size(col_pad) : 0 );
@@ -111,8 +152,15 @@ namespace caffe {
 	auto& input_img = input_img_v[ch];
 	auto const& mean_img  = rh.mean_imgs[ch];
 
-	if(!use_flat_mean)
+	if(!use_flat_mean) {
+	  if(input_img.as_vector().size() != mean_img.size()) {
+	    LOG(ERROR) << "\t Mean image size (" << mean_img.size() 
+		       << ") does not match w/ image (" << input_img.as_vector().size() 
+		       << ")!\n";
+	    throw std::exception();
+	  }
 	  input_img -= mean_img;
+	}
 	else
 	  input_img -= rh.img_means[ch];
 

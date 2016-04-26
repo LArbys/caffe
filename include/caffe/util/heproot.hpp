@@ -21,6 +21,11 @@ namespace caffe {
     std::vector<std::vector<float> > mean_imgs;
     std::vector<float> imin_v;
     std::vector<float> imax_v;
+
+    size_t random_col_pad;
+    size_t random_row_pad;
+    double random_adc_scale_mean;
+    double random_adc_scale_sigma;
   };
   
   template <typename Dtype>

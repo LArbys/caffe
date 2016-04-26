@@ -776,18 +776,18 @@ message ROOTDataParameter {
    
   optional int32 nentries = 4;
   
-  optional float imin_plane0 = 5;
-  optional float imax_plane0 = 6;
-
-  optional float imin_plane1 = 14;
-  optional float imax_plane1 = 15;
-
-  optional float imin_plane2 = 16;
-  optional float imax_plane2 = 17;
+  optional string imin = 5;
+  optional string imax = 6;
 
   optional float ch0_mean = 7;
   optional float ch1_mean = 8;
   optional float ch2_mean = 9;
+
+  optional float random_adc_scale_mean = 14;
+  optional float random_adc_scale_sigma = 15;
+
+  optional uint32 random_row_pad = 26;
+  optional uint32 random_col_pad = 27;
 
   // Specify whether to shuffle the data.
   // If shuffle == true, the ordering of the ROOT files is shuffled,

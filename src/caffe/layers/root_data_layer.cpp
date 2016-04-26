@@ -11,6 +11,7 @@
 #include "DataFormat/IOManager.h"
 #include "DataFormat/EventROI.h"
 #include "DataFormat/EventImage2D.h"
+#include "Base/Parser.h"
 //
 #include "caffe/layers/root_data_layer.hpp"
 #include "caffe/util/heproot.hpp"
@@ -43,14 +44,14 @@ namespace caffe {
 
     rh.nentries = this->layer_param_.root_data_param().nentries();
 
-    rh.imin_v.resize(3);
-    rh.imax_v.resize(3);
-    rh.imin_v[0] = this->layer_param_.root_data_param().imin_plane0();
-    rh.imin_v[1] = this->layer_param_.root_data_param().imin_plane1();
-    rh.imin_v[2] = this->layer_param_.root_data_param().imin_plane2();
-    rh.imax_v[0] = this->layer_param_.root_data_param().imax_plane0();
-    rh.imax_v[1] = this->layer_param_.root_data_param().imax_plane1();
-    rh.imax_v[2] = this->layer_param_.root_data_param().imax_plane2();
+    rh.imin_v = ::larcv::parser::FromString<std::vector<float> >(this->layer_param_.root_data_param().imin());
+    rh.imax_v = ::larcv::parser::FromString<std::vector<float> >(this->layer_param_.root_data_param().imax());
+    if(rh.imin_v.size() != rh.imax_v.size()) throw ::larcv::larbys("imin and imax array length different!");
+
+    rh.random_adc_scale_mean = this->layer_param_.root_data_param().random_adc_scale_mean();
+    rh.random_adc_scale_sigma = this->layer_param_.root_data_param().random_adc_scale_sigma();
+    rh.random_row_pad = this->layer_param_.root_data_param().random_row_pad();
+    rh.random_col_pad = this->layer_param_.root_data_param().random_col_pad();
 
     std::string mean_img_fname = this->layer_param_.root_data_param().mean();
 

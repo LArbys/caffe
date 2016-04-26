@@ -102,6 +102,9 @@ namespace caffe {
       ev_data  = (::larcv::EventImage2D*)(iom.get_data(image_producer_id));
       std::vector<larcv::Image2D> input_img_v;
       ev_data->Move(input_img_v);
+
+      size_t row_shift = ( row_pad ? random_size(row_pad) : 0 );
+      size_t col_shift = ( col_pad ? random_size(col_pad) : 0 );
       
       for(size_t ch=0;ch<nchannels;++ch) {
 	
@@ -118,17 +121,19 @@ namespace caffe {
 	canvas.reset_origin(input_img.meta().min_x(), input_img.meta().max_y());
 	canvas.paint(0.);
 
-	if(canvas.meta().rows() != input_img.meta().rows() ||
-	   canvas.meta().cols() != input_img.meta().cols() ) {
-	  
-	  size_t row_shift = random_size(row_pad);
-	  size_t col_shift = random_size(col_pad);
-
+	if(row_shift || col_shift) {
 	  canvas.reset_origin(input_img.meta().min_x() - col_shift * input_img.meta().pixel_width(),
 			      input_img.meta().max_y() + row_shift * input_img.meta().pixel_height());
+
 	}
 	canvas.overlay(input_img);
-	auto const& canvas_img = canvas.as_vector();
+	
+	auto crop_meta = larcv::ImageMeta(input_img.meta().width(), input_img.meta().height(),
+					  input_img.meta().rows(),  input_img.meta().cols(),
+					  canvas.meta().min_x(),    canvas.meta().max_y(),
+					  input_img.meta().plane());
+	auto cropped = canvas.crop(crop_meta);
+	auto const& canvas_img = cropped.as_vector();
 
 	size_t len = canvas_img.size();
 

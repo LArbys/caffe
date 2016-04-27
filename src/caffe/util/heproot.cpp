@@ -142,7 +142,8 @@ namespace caffe {
 
       auto input_images  = (::larcv::EventImage2D*)(iom.get_data(image_producer_id));
       std::vector<larcv::Image2D> input_img_v;
-      input_images->Move(input_img_v);
+      //input_images->Move(input_img_v);
+      input_img_v = input_images->Image2DArray();
 
       size_t row_shift = ( row_pad ? random_size(row_pad) : 0 );
       size_t col_shift = ( col_pad ? random_size(col_pad) : 0 );

@@ -167,6 +167,7 @@ namespace caffe {
 
 	input_img -= rh.imin_v[ch];
 
+
 	canvas.reset_origin(input_img.meta().min_x(), input_img.meta().max_y());
 	canvas.paint(0.);
 
@@ -182,20 +183,29 @@ namespace caffe {
 					  canvas.meta().min_x(),    canvas.meta().max_y(),
 					  input_img.meta().plane());
 	auto cropped = canvas.crop(crop_meta);
+
 	auto const& canvas_img = cropped.as_vector();
 
+	//auto const& canvas_img = input_img.as_vector();
 	size_t len = canvas_img.size();
 
 	for(size_t j=0;j<len;++j)  {
 
 	  auto idx =  ( entry * nchannels + ch ) * len + j;
-	  
+	  /*
+	  if(!use_flat_mean)
+	    data[idx] = input_img.as_vector()[j] - mean_img[j] - rh.imin_v[ch];
+	  else
+	    data[idx] = input_img.as_vector()[j] - rh.img_means[ch] - rh.imin_v[ch];
+	  */
+	  data[idx] = canvas_img[j];
+
 	  if ( data[idx] < 0             ) data[idx] = 0;
 
 	  data[idx] *= adc_scale_factor;
 
 	  if ( data[idx] > rh.imax_v[ch] ) data[idx] = rh.imax_v[ch];
-	  
+
 	}
       }
     }

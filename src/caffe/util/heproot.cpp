@@ -115,18 +115,21 @@ namespace caffe {
     bool use_flat_mean = rh.mean_imgs.empty();
     LOG(INFO) << "Reading nentries: " << nentries;
 
-    size_t last_entry = ::larcv::kINVALID_SIZE;
-
+    static size_t last_entry = 0;
     for(int entry = 0; entry < nentries; ++entry ) {
       float adc_scale_factor = (float)(adc_scale_v[entry]);
 
-      size_t random_entry = random_size(iom.get_n_entries());
-      while(random_entry == last_entry)
-	random_entry = random_size(iom.get_n_entries());
-      
-      last_entry = random_entry;
-
-      iom.read_entry(random_entry);
+      if(rh.random_access) {
+	size_t random_entry = random_size(iom.get_n_entries());
+	while(random_entry == last_entry)
+	  random_entry = random_size(iom.get_n_entries());
+	last_entry = random_entry;
+	iom.read_entry(random_size(iom.get_n_entries()));
+      }else{
+	if(!entry) LOG(INFO) << "\033[93m Sequential read starts from: " << entry + last_entry << "\033[00m\n";
+	iom.read_entry(last_entry);
+	++last_entry;
+      }
 
       label[entry] = 1; // Neutrino by default
       ++nu_count;
@@ -283,10 +286,17 @@ namespace caffe {
 
     bool use_flat_mean = rh.mean_imgs.empty();
     LOG(INFO) << "Reading nentries: " << nentries;
+    static size_t last_entry=0;
     for(int entry = 0; entry < nentries; ++entry ) {
-      double adc_scale_factor = (double)(adc_scale_v[entry]);
-      iom.read_entry(random_size(iom.get_n_entries()));
 
+      double adc_scale_factor = (double)(adc_scale_v[entry]);
+      if(rh.random_access) {
+	iom.read_entry(random_size(iom.get_n_entries()));
+      }else{
+	if(!entry) LOG(INFO) << "\033[93m Sequential read starts from: " << entry + last_entry << "\033[00m\n";
+	iom.read_entry(entry + last_entry);
+	last_entry = entry + last_entry;
+      }
       label[entry] = 1; // Neutrino by default
       ++nu_count;
       auto event_roi = (larcv::EventROI*)(iom.get_data(roi_producer_id));

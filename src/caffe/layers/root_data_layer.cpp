@@ -28,7 +28,7 @@ namespace caffe {
     root_helper rh;
 
     rh.filename = filename;
-    
+    rh.random_access = this->layer_param_.root_data_param().random_access();
     int top_size = this->layer_param_.top_size();
     root_blobs_.resize(top_size);
 

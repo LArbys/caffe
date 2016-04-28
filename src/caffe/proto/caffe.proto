@@ -762,7 +762,7 @@ message HDF5OutputParameter {
   optional string file_name = 1;
 }
 
-//ROOT layer current max ### 15 ###
+//ROOT layer current max ### 16 ###
 message ROOTDataParameter {
   // Specify the data source.
   optional string source = 1;
@@ -786,6 +786,8 @@ message ROOTDataParameter {
 
   optional uint32 random_row_pad = 14;
   optional uint32 random_col_pad = 15;
+
+  optional bool random_access = 16;
 
   // Specify whether to shuffle the data.
   // If shuffle == true, the ordering of the ROOT files is shuffled,

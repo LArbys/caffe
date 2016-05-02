@@ -1,25 +1,33 @@
-#include "DataFormat/IOManager.h"
+#include "APICaffe/ThreadDatumFiller.h"
 
 namespace larcv {
   class SingleIOManager {
     
   private:
-    SingleIOManager(std::string fname) : manager(larcv::IOManager::kREAD,"IOData")
-    { manager.add_in_file(fname); manager.initialize(); }
+    SingleIOManager(size_t id) : data_holder(), _id(id)
+    {}
+
   public:
-    ~SingleIOManager(){ manager.finalize(); }
+    ~SingleIOManager(){ data_holder.reset(); }
     
-    static SingleIOManager& get(const std::string& fname) { 
-      auto iter = _siom_m.find(fname);
-      if(iter != _siom_m.end()) return (*((*iter).second));
-      _siom_m[fname] = new SingleIOManager(fname);
-      return (*(_siom_m[fname]));
+    static SingleIOManager& get(size_t id) {
+      return (*(_siom_v.at(id)));
     }
+
+    static SingleIOManager& get() {
+      _siom_v.push_back(new SingleIOManager(_siom_v.size()));
+      return (*(_siom_v.back()));
+    }
+
+    size_t id() const { return _id; }
     
-    IOManager manager;
+    ThreadDatumFiller data_holder;
 
   private:
-    static std::map<std::string,larcv::SingleIOManager*> _siom_m;
+    size_t _id; 
+
+  private:
+    static std::vector<larcv::SingleIOManager*> _siom_v;
 
   };
 }

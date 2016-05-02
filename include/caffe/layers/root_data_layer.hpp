@@ -52,18 +52,10 @@ namespace caffe {
 			      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {}
     virtual void LoadROOTFileData(const std::string& file_producer);
     
-    std::vector<std::string> root_filenames_;
-    
-    unsigned int num_files_;
     unsigned int current_file_;
     unsigned int current_row_;
 
     std::vector<shared_ptr<Blob<Dtype> > > root_blobs_;
-    std::vector<unsigned int> data_permutation_;
-    std::vector<unsigned int> file_permutation_;
-    
-    //::larcv::IOManager _iom;
-    std::vector<std::vector<float> > _mean_imgs;
     
   };
 

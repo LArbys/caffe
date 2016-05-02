@@ -3,7 +3,7 @@
 
 namespace larcv {
 
-  std::map<std::string,larcv::SingleIOManager*> SingleIOManager::_siom_m;
+  std::vector<larcv::SingleIOManager*> SingleIOManager::_siom_v;
 
 }
 

@@ -8,33 +8,15 @@
 
 namespace caffe {
 
-
   struct root_helper  {
 
     //::larcv::IOManager* iom;
-    std::string filename;
-    std::string image_producer;
-    std::string roi_producer;
-    int nentries;
-    
-    std::vector<float> img_means;
-    std::vector<std::vector<float> > mean_imgs;
-    std::vector<float> imin_v;
-    std::vector<float> imax_v;
-    bool   random_access;
+    size_t _filler_id;
 
-    size_t random_col_pad;
-    size_t random_row_pad;
-    double random_adc_scale_mean;
-    double random_adc_scale_sigma;
   };
   
   template <typename Dtype>
-  void root_load_data(root_helper& rh,
-		      Blob<Dtype>* data_blob,
-		      Blob<Dtype>* label_blob);
-
-  
+  void root_load_data(root_helper& rh, Blob<Dtype>* data_blob, Blob<Dtype>* label_blob);
   
 }  // namespace caffe
 

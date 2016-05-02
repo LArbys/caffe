@@ -52,9 +52,6 @@ namespace caffe {
 			      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {}
     virtual void LoadROOTFileData(const std::string& file_producer);
     
-    unsigned int current_file_;
-    unsigned int current_row_;
-
     std::vector<shared_ptr<Blob<Dtype> > > root_blobs_;
     
   };

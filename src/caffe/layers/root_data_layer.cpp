@@ -8,10 +8,7 @@
 #include "stdint.h"
 
 // LArCV
-#include "DataFormat/IOManager.h"
-#include "DataFormat/EventROI.h"
-#include "DataFormat/EventImage2D.h"
-#include "Base/Parser.h"
+#include "APICaffe/ThreadDatumFiller.h"
 //
 #include "caffe/layers/root_data_layer.hpp"
 #include "caffe/util/heproot.hpp"
@@ -25,13 +22,21 @@ namespace caffe {
   template <typename Dtype>
   void ROOTDataLayer<Dtype>::LoadROOTFileData(const std::string& filename) {
 
+    size_t batch_size = this->layer_param_.root_data_param().batch_size();
+
     //Instantiate ThreadDatumFiller only once
     static size_t id = ::larcv::kINVALID_SIZE;
     if(id == ::larcv::kINVALID_SIZE) {
-
+      id = ::larcv::ThreadFillerFactory::get().create_filler();
+      // Instantiate and configure the filler
+      auto const& filler = ::larcv::ThreadFillerFactory::get().get_filler(id);
+      filler.configure(this->layer_param_.root_data_param().filler_config());
+      // Start read thread
+      filler.batch_process(batch_size);
     }
 
     root_helper rh;
+    rh._filler_id = id;
 
     int top_size = this->layer_param_.top_size();
     root_blobs_.resize(top_size);
@@ -42,9 +47,11 @@ namespace caffe {
       
       root_blobs_[i] = shared_ptr<Blob<Dtype> >(new Blob<Dtype>());
 
-    root_load_data(rh,
-		   root_blobs_[0].get(),
-		   root_blobs_[1].get());
+    root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get());
+
+    // Start read thread
+    auto const& filler = ::larcv::ThreadFillerFactory::get().get_filler(id);
+    filler.batch_process(batch_size);
     
     // MinTopBlobs==1 guarantees at least one top blob
     CHECK_GE(root_blobs_[0]->num_axes(), 1) << "Input must have at least 1 axis.";

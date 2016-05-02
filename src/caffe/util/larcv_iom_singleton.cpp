@@ -3,7 +3,7 @@
 
 namespace larcv {
 
-  std::vector<larcv::SingleIOManager*> SingleIOManager::_siom_v;
+  ThreadFillerFactory* ThreadFillerFactory::_me = nullptr;
 
 }
 

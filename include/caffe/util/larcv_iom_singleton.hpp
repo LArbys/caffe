@@ -1,33 +1,36 @@
 #include "APICaffe/ThreadDatumFiller.h"
 
 namespace larcv {
-  class SingleIOManager {
+  class ThreadFillerFactory {
     
   private:
-    SingleIOManager(size_t id) : data_holder(), _id(id)
-    {}
+    ThreadFillerFactory() {}
 
   public:
-    ~SingleIOManager(){ data_holder.reset(); }
+    ~ThreadFillerFactory(){ _filler_v.clear(); }
     
-    static SingleIOManager& get(size_t id) {
-      return (*(_siom_v.at(id)));
+    ThreadDatumFiller& get_filler(size_t id) {
+      if(id >= _filler_v.size()) 
+        throw larbys("Invalid filler id requested!");
+
+      return _filler_v[id];
     }
 
-    static SingleIOManager& get() {
-      _siom_v.push_back(new SingleIOManager(_siom_v.size()));
-      return (*(_siom_v.back()));
+    size_t create_filler() {
+      size_t id = _filler_v.size();
+      _filler_v.push_back(::larcv::ThreadDatumFiller());
+      return id;
     }
 
-    size_t id() const { return _id; }
-    
-    ThreadDatumFiller data_holder;
+    static ThreadFillerFactory& get() {
+      if(!_me) _me = new ThreadFillerFactory;
+      return *_me;
+    }
 
   private:
-    size_t _id; 
 
-  private:
-    static std::vector<larcv::SingleIOManager*> _siom_v;
+    static ThreadFillerFactory* _me;
+    std::vector<larcv::ThreadDatumFiller> _filler_v;
 
   };
 }

@@ -12,6 +12,7 @@
 //
 #include "caffe/layers/root_data_layer.hpp"
 #include "caffe/util/heproot.hpp"
+#include "caffe/util/larcv_iom_singleton.hpp"
 
 namespace caffe {
   
@@ -20,23 +21,20 @@ namespace caffe {
   
   // Load data and label from ROOT filename into the class property blobs.
   template <typename Dtype>
-  void ROOTDataLayer<Dtype>::LoadROOTFileData(const std::string& filename) {
+  void ROOTDataLayer<Dtype>::LoadROOTFileData() {
 
     size_t batch_size = this->layer_param_.root_data_param().batch_size();
-
+    std::string name  = this->layer_param_.root_data_param().filler_name();
     //Instantiate ThreadDatumFiller only once
-    static size_t id = ::larcv::kINVALID_SIZE;
-    if(id == ::larcv::kINVALID_SIZE) {
-      id = ::larcv::ThreadFillerFactory::get().create_filler();
-      // Instantiate and configure the filler
-      auto const& filler = ::larcv::ThreadFillerFactory::get().get_filler(id);
+    if(!(::larcv::ThreadFillerFactory::exist_filler(name))) {
+      auto& filler = ::larcv::ThreadFillerFactory::get_filler(name);
       filler.configure(this->layer_param_.root_data_param().filler_config());
       // Start read thread
       filler.batch_process(batch_size);
     }
 
     root_helper rh;
-    rh._filler_id = id;
+    rh._filler_name = name;
 
     int top_size = this->layer_param_.top_size();
     root_blobs_.resize(top_size);
@@ -50,7 +48,7 @@ namespace caffe {
     root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get());
 
     // Start read thread
-    auto const& filler = ::larcv::ThreadFillerFactory::get().get_filler(id);
+    auto& filler = ::larcv::ThreadFillerFactory::get_filler(name);
     filler.batch_process(batch_size);
     
     // MinTopBlobs==1 guarantees at least one top blob
@@ -60,20 +58,6 @@ namespace caffe {
       CHECK_EQ(root_blobs_[i]->shape(0), num);
     }
 
-    // Default to identity permutation.
-    data_permutation_.clear();
-    data_permutation_.resize(root_blobs_[0]->shape(0));
-    for (int i = 0; i < root_blobs_[0]->shape(0); i++)
-      data_permutation_[i] = i;
-
-    // Shuffle if needed.
-    if (this->layer_param_.root_data_param().shuffle()) {
-      std::random_shuffle(data_permutation_.begin(), data_permutation_.end());
-      /*
-      DLOG(INFO) << "Successully loaded " << root_blobs_[0]->shape(0)
-		 << " rows (shuffled)";
-      */
-    } 
     //else { DLOG(INFO) << "Successully loaded " << root_blobs_[0]->shape(0) << " rows"; }
   }
 
@@ -106,7 +90,7 @@ namespace caffe {
 					 const vector<Blob<Dtype>*>& top) {
     const int batch_size = this->layer_param_.root_data_param().batch_size();
     LoadROOTFileData();
-    for (int i = 0; i < batch_size; ++i, ++current_row_) {
+    for (int i = 0; i < batch_size; ++i) {
 
       for (int j = 0; j < this->layer_param_.top_size(); ++j) {
 	int data_dim = top[j]->count() / top[j]->shape(0);

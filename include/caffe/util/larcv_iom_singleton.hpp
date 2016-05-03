@@ -1,3 +1,5 @@
+#ifndef THREADFILLERFACTORY_H
+#define THREADFILLERFACTORY_H
 #include "APICaffe/ThreadDatumFiller.h"
 
 namespace larcv {
@@ -7,32 +9,25 @@ namespace larcv {
     ThreadFillerFactory() {}
 
   public:
-    ~ThreadFillerFactory(){ _filler_v.clear(); }
+    ~ThreadFillerFactory(){ for(auto& name_ptr : _filler_m) delete name_ptr.second; _filler_m.clear(); }
+
+    static bool exist_filler(const std::string& name) {
+      auto iter = _filler_m.find(name);
+      return (iter != _filler_m.end());
+    }
     
-    ThreadDatumFiller& get_filler(size_t id) {
-      if(id >= _filler_v.size()) 
-        throw larbys("Invalid filler id requested!");
-
-      return _filler_v[id];
-    }
-
-    size_t create_filler() {
-      size_t id = _filler_v.size();
-      _filler_v.push_back(::larcv::ThreadDatumFiller());
-      return id;
-    }
-
-    static ThreadFillerFactory& get() {
-      if(!_me) _me = new ThreadFillerFactory;
-      return *_me;
+    static ThreadDatumFiller& get_filler(const std::string& name) {
+      auto iter = _filler_m.find(name);
+      if(iter != _filler_m.end()) return (*((*iter).second));
+      auto ptr = new ::larcv::ThreadDatumFiller(name);
+      _filler_m[name]=ptr;
+      return (*ptr);
     }
 
   private:
-
-    static ThreadFillerFactory* _me;
-    std::vector<larcv::ThreadDatumFiller> _filler_v;
-
+    
+    static std::map<std::string,larcv::ThreadDatumFiller*> _filler_m;
   };
 }
 
-
+#endif

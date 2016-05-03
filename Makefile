@@ -402,14 +402,14 @@ LIBRARY_DIRS += $(LIB_BUILD_DIR)
 
 
 #VIC
-LIBRARY_DIRS += $(shell larcv-config --libdir)
+LIBRARY_DIRS += $(shell larcvapp-config --libdir)
 LIBRARY_DIRS += $(shell root-config --libdir)
 
-INCLUDE_DIRS += $(shell larcv-config --incdir)
+INCLUDE_DIRS += $(shell larcvapp-config --incdir)
 INCLUDE_DIRS += $(shell root-config --incdir)
 
 LDFLAGS += $(shell root-config --libs)
-LDFLAGS += $(shell larcv-config --libs)
+LDFLAGS += $(shell larcvapp-config --libs)
 
 # Automatic dependency generation (nvcc is handled separately)
 CXXFLAGS += -MMD -MP $(shell root-config --cflags)

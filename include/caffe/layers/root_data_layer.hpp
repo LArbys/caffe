@@ -23,7 +23,7 @@ namespace caffe {
   public:
     explicit ROOTDataLayer(const LayerParameter& param)
     //: Layer<Dtype>(param) , _iom(::larcv::IOManager::kREAD,"IOData") , _mean_imgs() {}
-      : Layer<Dtype>(param) , _mean_imgs() {}
+      : Layer<Dtype>(param) {}
 
     virtual ~ROOTDataLayer();
 
@@ -50,7 +50,7 @@ namespace caffe {
 			      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {}
     virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
 			      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {}
-    virtual void LoadROOTFileData(const std::string& file_producer);
+    virtual void LoadROOTFileData();
     
     std::vector<shared_ptr<Blob<Dtype> > > root_blobs_;
     

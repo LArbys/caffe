@@ -11,7 +11,7 @@ namespace caffe {
   struct root_helper  {
 
     //::larcv::IOManager* iom;
-    size_t _filler_id;
+    std::string _filler_name;
 
   };
   

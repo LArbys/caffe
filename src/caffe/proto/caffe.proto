@@ -767,6 +767,7 @@ message ROOTDataParameter {
   // Specify the batch size.
   optional uint32 batch_size = 1;
   optional string filler_config = 2;
+  optional string filler_name = 3;
 }
 
 message HingeLossParameter {

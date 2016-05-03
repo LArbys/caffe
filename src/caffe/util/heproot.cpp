@@ -10,7 +10,7 @@ namespace caffe {
   template <>
   void root_load_data<float>(root_helper& rh, Blob<float>* data_blob, Blob<float>* label_blob)
   {
-    auto const& filler = ::larcv::ThreadFillerFactory::get().get_filler(_filler_id);
+    auto& filler = ::larcv::ThreadFillerFactory::get_filler(rh._filler_name);
     size_t wait_counter=0;
     while(filler.thread_running()) {
       usleep(200);
@@ -31,13 +31,15 @@ namespace caffe {
 
     data_blob->Reshape(data_dims);  
     label_blob->Reshape(label_dims);
-
+    /*
     LOG(INFO) << "\t>> memcpy with data.size() " << data.size() 
     	        << " with memory size " << data.size() * sizeof(float)  << "\n";
+    */
     memcpy(data_blob->mutable_cpu_data(),data.data(),data.size() * sizeof(float) );
-    
+    /*
     LOG(INFO) << "\t>> memcpy with label.size() " << label.size() 
     	        << " with memory size " << label.size() * sizeof(float)  << "\n";
+    */
     memcpy(label_blob->mutable_cpu_data(),label.data(),label.size() * sizeof(float) );    
   }
 

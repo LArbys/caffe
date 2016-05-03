@@ -3,7 +3,7 @@
 
 namespace larcv {
 
-  ThreadFillerFactory* ThreadFillerFactory::_me = nullptr;
+  std::map<std::string,larcv::ThreadDatumFiller*> ThreadFillerFactory::_filler_m;
 
 }
 

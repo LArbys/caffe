@@ -12,7 +12,8 @@
 //
 #include "caffe/layers/root_data_layer.hpp"
 #include "caffe/util/heproot.hpp"
-#include "caffe/util/larcv_iom_singleton.hpp"
+#include "APICaffe/ThreadDatumFiller.h"
+#include "APICaffe/ThreadFillerFactory.h"
 
 namespace caffe {
   

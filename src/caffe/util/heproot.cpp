@@ -1,9 +1,9 @@
 #include "caffe/util/heproot.hpp"
-#include "caffe/util/larcv_iom_singleton.hpp"
 #include <string>
 #include <vector>
 //LArCV
 #include "APICaffe/ThreadDatumFiller.h"
+#include "APICaffe/ThreadFillerFactory.h"
 
 namespace caffe {
 

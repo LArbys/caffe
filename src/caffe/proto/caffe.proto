@@ -768,6 +768,7 @@ message ROOTDataParameter {
   optional uint32 batch_size = 1;
   optional string filler_config = 2;
   optional string filler_name = 3;
+  optional bool   use_thread = 4;
 }
 
 message HingeLossParameter {

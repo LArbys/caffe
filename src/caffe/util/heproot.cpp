@@ -30,7 +30,11 @@ namespace caffe {
     label_dims[0] = data_dims[0];
 
     data_blob->Reshape(data_dims);  
-    label_blob->Reshape(label_dims);
+
+    //    label_blob->Reshape(label_dims);
+
+    label_blob->Reshape(data_dims);
+
     /*
     LOG(INFO) << "\t>> memcpy with data.size() " << data.size() 
     	        << " with memory size " << data.size() * sizeof(float)  << "\n";

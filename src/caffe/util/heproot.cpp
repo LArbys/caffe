@@ -24,15 +24,16 @@ namespace caffe {
     //
     auto const& data_dims = filler.dim();
     auto const& data = filler.data();
-    std::vector<int> label_dims(1);
-    auto const& label = filler.labels();
 
-    label_dims[0] = data_dims[0];
+    // changing for segmentation
+    //std::vector<int> label_dims(1);
+    //auto const& label_dims = filler.label_dim();
+
+    auto const& label = filler.labels();
+    
+    //label_dims[0] = data_dims[0];
 
     data_blob->Reshape(data_dims);  
-
-    //    label_blob->Reshape(label_dims);
-
     label_blob->Reshape(data_dims);
 
     /*

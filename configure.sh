@@ -23,3 +23,4 @@ case `uname -n` in
 	;;
 esac
 
+export PYTHONPATH=$CAFFE_DIR/python:$PYTHONPATH

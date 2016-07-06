@@ -27,6 +27,7 @@ namespace caffe {
     size_t batch_size = this->layer_param_.root_data_param().batch_size();
     std::string name  = this->layer_param_.root_data_param().filler_name();
     bool use_thread  = this->layer_param_.root_data_param().use_thread();
+    
     //Instantiate ThreadDatumFiller only once
     if(!(::larcv::ThreadFillerFactory::exist_filler(name))) {
       auto& filler = ::larcv::ThreadFillerFactory::get_filler(name);
@@ -71,6 +72,7 @@ namespace caffe {
   template <typename Dtype>
   void ROOTDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 					const vector<Blob<Dtype>*>& top) {
+
     // Refuse transformation parameters since ROOT is totally generic.
     CHECK(!this->layer_param_.has_transform_param()) <<
       this->type() << " does not transform data.";

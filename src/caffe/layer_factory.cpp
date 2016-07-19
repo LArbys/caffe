@@ -10,6 +10,7 @@
 #include "caffe/layers/conv_layer.hpp"
 #include "caffe/layers/lrn_layer.hpp"
 #include "caffe/layers/pooling_layer.hpp"
+#include "caffe/layers/unpooling_layer.hpp"
 #include "caffe/layers/relu_layer.hpp"
 #include "caffe/layers/sigmoid_layer.hpp"
 #include "caffe/layers/softmax_layer.hpp"
@@ -108,6 +109,24 @@ shared_ptr<Layer<Dtype> > GetPoolingLayer(const LayerParameter& param) {
 }
 
 REGISTER_LAYER_CREATOR(Pooling, GetPoolingLayer);
+
+
+// Get unpooling layer according to engine. vic again...
+template <typename Dtype>
+shared_ptr<Layer<Dtype> > GetUnpoolingLayer(const LayerParameter& param) {
+  UnpoolingParameter_Engine engine = param.unpooling_param().engine();
+  if (engine == UnpoolingParameter_Engine_DEFAULT) {
+    engine = UnpoolingParameter_Engine_CAFFE;
+  }
+  if (engine == UnpoolingParameter_Engine_CAFFE) {
+    return shared_ptr<Layer<Dtype> >( new UnpoolingLayer<Dtype>(param) );
+  } else {
+    LOG(FATAL) << "Layer " << param.name() << " has unknown engine.";
+  }
+}
+
+REGISTER_LAYER_CREATOR(UNPOOLING, GetUnpoolingLayer);
+
 
 // Get LRN layer according to engine
 template <typename Dtype>

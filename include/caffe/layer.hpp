@@ -165,8 +165,7 @@ class Layer {
    * @param bottom
    *     the input blobs, whose diff fields will store the gradient of the error
    *     with respect to themselves after Backward is run
-   *
-   * The Backward wrapper calls the relevant device wrapper function
+   *   * The Backward wrapper calls the relevant device wrapper function
    * (Backward_cpu or Backward_gpu) to compute the bottom blob diffs given the
    * top blob diffs.
    *
@@ -197,6 +196,16 @@ class Layer {
    * @brief Returns the scalar loss associated with a top blob at a given index.
    */
   inline Dtype loss(const int top_index) const {
+
+    //VIC debug
+    // std::cout << "Returning scalar loss\n";
+    // std::cout << "loss_.size(): "  << loss_.size() << "\n";
+    // std::cout << "top_index: " << top_index << "\n";
+    // if ((loss_.size() > top_index)) 
+    //   std::cout << "loss_[top_index] : " << loss_[top_index] << "\n";
+    // else
+    //   std::cout << " 0 " << 0 << "\n";
+
     return (loss_.size() > top_index) ? loss_[top_index] : Dtype(0);
   }
 

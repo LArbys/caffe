@@ -41,7 +41,7 @@ namespace caffe {
     }
 
     // Weighting
-    class_loss_weights_.resize(this->layer_param_.loss_param().class_loss_weights(i);
+    class_loss_weights_.resize(this->layer_param_.loss_param().class_loss_weights_size());
     for( int i = 0; i < class_loss_weights_.size(); ++i) { 
       class_loss_weights_[i] = this->layer_param_.loss_param().class_loss_weights(i);
       LOG(INFO) << "class_loss_weights[" << i << "] = " << class_loss_weights_[i] << std::endl;
@@ -129,11 +129,11 @@ namespace caffe {
                 log(std::max(prob_data[i * dim + label_value * inner_num_ + j],
                              Dtype(FLT_MIN)));
         ++count;
-        weight_sum += weight;
+        weightsum += weight;
       }
     }
     if ( class_loss_weights_.size()) {
-      top[0]->mutable_cpu_data()[0] = loss / weight_sum;
+      top[0]->mutable_cpu_data()[0] = loss / weightsum;
     }else{
       top[0]->mutable_cpu_data()[0] = loss / get_normalizer(normalization_, count);
     }

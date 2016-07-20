@@ -43,10 +43,7 @@ class SoftmaxLayer : public Layer<Dtype> {
   Blob<Dtype> sum_multiplier_;
   /// scale is an intermediate Blob to hold temporary results.
   Blob<Dtype> scale_;
-  // Taken from mohamed-ezz's implementation of class-weighting (spatial weight map feature excluded)
-  // Ref: https://github.com/mohamed-ezz/caffe/commit/876e387a6d7f8974f68f42beacd3728b4fc92ff7
-  /// provide loss weights for different classes to compensate for unbalanaced training data or different importance of the classes
-  vector<float> class_loss_weights_;
+
 };
 
 }  // namespace caffe

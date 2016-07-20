@@ -450,6 +450,7 @@ message LossParameter {
     // Do not normalize the loss.
     NONE = 3;
   }
+  repeated float class_loss_weights = 4; 
   optional NormalizationMode normalization = 3 [default = VALID];
   // Deprecated.  Ignored if normalization is specified.  If normalization
   // is not specified, then setting this to false will be equivalent to

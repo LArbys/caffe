@@ -149,17 +149,11 @@ void Net<Dtype>::Init(const NetParameter& in_param) {
     }
     LOG_IF(INFO, Caffe::root_solver())
         << "Setting up " << layer_names_[layer_id];
-    //std::cout << "top_vecs_[layer_id].size() : " << top_vecs_[layer_id].size() << "\n";
     for (int top_id = 0; top_id < top_vecs_[layer_id].size(); ++top_id) {
-      //std::cout << "top_id: " << top_id << " blob_loss_weights_.size() " << blob_loss_weights_.size() << " and layer id is " << layer_id << "\n";
       if (blob_loss_weights_.size() <= top_id_vecs_[layer_id][top_id]) {
-	//std::cout << "top_id_vecs_[layer_id][top_id] : " << top_id_vecs_[layer_id][top_id] << "\n";
         blob_loss_weights_.resize(top_id_vecs_[layer_id][top_id] + 1, Dtype(0));
       }
-      //std::cout << "layer id is " << layer_id << "\n";
-      //std::cout << "blob_loss_weights_.size() is now : " << blob_loss_weights_.size() << "\n";
       blob_loss_weights_[top_id_vecs_[layer_id][top_id]] = layer->loss(top_id);
-      //std::cout << "aho? \n";
       LOG_IF(INFO, Caffe::root_solver())
           << "Top shape: " << top_vecs_[layer_id][top_id]->shape_string();
       if (layer->loss(top_id)) {

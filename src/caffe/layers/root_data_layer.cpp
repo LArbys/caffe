@@ -26,7 +26,6 @@ namespace caffe {
 
     size_t batch_size = this->layer_param_.root_data_param().batch_size();
     std::string name  = this->layer_param_.root_data_param().filler_name();
-    bool use_thread  = this->layer_param_.root_data_param().use_thread();
     
     //Instantiate ThreadDatumFiller only once
     if(!(::larcv::ThreadFillerFactory::exist_filler(name))) {
@@ -34,7 +33,7 @@ namespace caffe {
       filler.configure(this->layer_param_.root_data_param().filler_config());
       // Start read thread
       filler.batch_process(batch_size);
-    }else if(!use_thread){
+    }else if(filler.thread_config()){
       auto& filler = ::larcv::ThreadFillerFactory::get_filler(name);
       filler.batch_process(batch_size);
     }
@@ -54,7 +53,7 @@ namespace caffe {
     root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get());
 
     // Start read thread
-    if(use_thread) {
+    if(filler.thread_config()) {
       auto& filler = ::larcv::ThreadFillerFactory::get_filler(name);
       filler.batch_process(batch_size);
     }

@@ -123,6 +123,11 @@ class SoftmaxWithLossLayer : public LossLayer<Dtype> {
   LossParameter_NormalizationMode normalization_;
 
   int softmax_axis_, outer_num_, inner_num_;
+
+  // Taken from mohamed-ezz's implementation of class-weighting (spatial weight map feature excluded)
+  // Ref: https://github.com/mohamed-ezz/caffe/commit/876e387a6d7f8974f68f42beacd3728b4fc92ff7
+  /// provide loss weights for different classes to compensate for unbalanaced training data or different importance of the classes
+  vector<float> class_loss_weights_;
 };
 
 }  // namespace caffe

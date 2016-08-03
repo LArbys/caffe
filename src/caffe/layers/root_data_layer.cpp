@@ -26,17 +26,17 @@ namespace caffe {
 
     size_t batch_size = this->layer_param_.root_data_param().batch_size();
     std::string name  = this->layer_param_.root_data_param().filler_name();
-    bool use_thread  = this->layer_param_.root_data_param().use_thread();
+    
     //Instantiate ThreadDatumFiller only once
-    if(!(::larcv::ThreadFillerFactory::exist_filler(name))) {
-      auto& filler = ::larcv::ThreadFillerFactory::get_filler(name);
+    bool first_time = !(::larcv::ThreadFillerFactory::exist_filler(name));
+    auto& filler = ::larcv::ThreadFillerFactory::get_filler(name);
+    if(first_time) {
       filler.configure(this->layer_param_.root_data_param().filler_config());
       // Start read thread
       filler.batch_process(batch_size);
-    }else if(!use_thread){
-      auto& filler = ::larcv::ThreadFillerFactory::get_filler(name);
-      filler.batch_process(batch_size);
     }
+    else if(filler.thread_config())
+      filler.batch_process(batch_size);
 
     root_helper rh;
     rh._filler_name = name;
@@ -53,10 +53,8 @@ namespace caffe {
     root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get());
 
     // Start read thread
-    if(use_thread) {
-      auto& filler = ::larcv::ThreadFillerFactory::get_filler(name);
+    if(filler.thread_config())
       filler.batch_process(batch_size);
-    }
 
     // MinTopBlobs==1 guarantees at least one top blob
     CHECK_GE(root_blobs_[0]->num_axes(), 1) << "Input must have at least 1 axis.";
@@ -71,6 +69,7 @@ namespace caffe {
   template <typename Dtype>
   void ROOTDataLayer<Dtype>::LayerSetUp(const vector<Blob<Dtype>*>& bottom,
 					const vector<Blob<Dtype>*>& top) {
+
     // Refuse transformation parameters since ROOT is totally generic.
     CHECK(!this->layer_param_.has_transform_param()) <<
       this->type() << " does not transform data.";

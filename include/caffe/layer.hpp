@@ -165,8 +165,7 @@ class Layer {
    * @param bottom
    *     the input blobs, whose diff fields will store the gradient of the error
    *     with respect to themselves after Backward is run
-   *
-   * The Backward wrapper calls the relevant device wrapper function
+   *   * The Backward wrapper calls the relevant device wrapper function
    * (Backward_cpu or Backward_gpu) to compute the bottom blob diffs given the
    * top blob diffs.
    *

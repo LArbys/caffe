@@ -22,25 +22,25 @@ namespace caffe {
     //
     // Define blob dimension
     //
-    auto const& data_dims = filler.dim();
-    auto const& data = filler.data();
-    std::vector<int> label_dims(1);
-    auto const& label = filler.labels();
+    auto const& image_dims = filler.dim();
+    auto const& image_data = filler.data();
 
-    label_dims[0] = data_dims[0];
+    auto const& label_dims = filler.dim(false);
+    auto const& label_data = filler.labels();
 
-    data_blob->Reshape(data_dims);  
+    data_blob->Reshape(image_dims);  
     label_blob->Reshape(label_dims);
+
     /*
     LOG(INFO) << "\t>> memcpy with data.size() " << data.size() 
     	        << " with memory size " << data.size() * sizeof(float)  << "\n";
     */
-    memcpy(data_blob->mutable_cpu_data(),data.data(),data.size() * sizeof(float) );
+    memcpy(data_blob->mutable_cpu_data(),image_data.data(),image_data.size() * sizeof(float) );
     /*
     LOG(INFO) << "\t>> memcpy with label.size() " << label.size() 
     	        << " with memory size " << label.size() * sizeof(float)  << "\n";
     */
-    memcpy(label_blob->mutable_cpu_data(),label.data(),label.size() * sizeof(float) );    
+    memcpy(label_blob->mutable_cpu_data(),label_data.data(),label_data.size() * sizeof(float) );    
   }
 
   template <>

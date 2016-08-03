@@ -397,16 +397,11 @@ LIBRARY_DIRS += $(BLAS_LIB)
 
 LIBRARY_DIRS += $(LIB_BUILD_DIR)
 
-
-#VIC
-LIBRARY_DIRS += $(shell larcvapp-config --libdir)
+LIBRARY_DIRS += $(shell larcv-config --libdir)
 LIBRARY_DIRS += $(shell root-config --libdir)
 
-INCLUDE_DIRS += $(shell larcvapp-config --incdir)
+INCLUDE_DIRS += $(shell larcv-config --incdir)
 INCLUDE_DIRS += $(shell root-config --incdir)
-
-LDFLAGS += $(shell root-config --libs)
-LDFLAGS += $(shell larcvapp-config --libs)
 
 # Automatic dependency generation (nvcc is handled separately)
 CXXFLAGS += -MMD -MP $(shell root-config --cflags)
@@ -426,9 +421,13 @@ else
 	PKG_CONFIG :=
 endif
 
-#vic
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir)) $(PKG_CONFIG) \
 		$(foreach library,$(LIBRARIES),-l$(library))
+
+LDFLAGS += $(shell root-config --libs)
+LDFLAGS += $(shell larcv-config --libs)
+#LDFLAGS += -L/usr/local/opencv/lib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -L$(LARCV_LIBDIR) -llarcv
+#LDFLAGS += $(shell larcvapp-config --libs)
 
 PYTHON_LDFLAGS := $(LDFLAGS) $(foreach library,$(PYTHON_LIBRARIES),-l$(library))
 

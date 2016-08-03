@@ -59,7 +59,7 @@ namespace caffe {
     ROOTDataParameter* root_data_param = param.mutable_root_data_param();
     int batch_size = 1;
     root_data_param->set_batch_size(batch_size);
-    root_data_param->set_source(*(this->filename));
+    //root_data_param->set_source(*(this->filename));
     int num_cols = 3;
     int height   = 10;
     int width    = 10;

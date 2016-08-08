@@ -52,10 +52,9 @@ namespace caffe {
 
     root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get());
 
-    // Start read thread
-    if(filler.thread_config())
-      filler.batch_process(batch_size);
-
+    //if(filler.thread_config())
+    filler.batch_process(batch_size);
+    
     // MinTopBlobs==1 guarantees at least one top blob
     CHECK_GE(root_blobs_[0]->num_axes(), 1) << "Input must have at least 1 axis.";
     const int num = root_blobs_[0]->shape(0);

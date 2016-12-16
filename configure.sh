@@ -17,6 +17,13 @@ case `uname -n` in
         fi
         ln -sf $CAFFE_DIR/Makefile.config.wu $CAFFE_DIR/Makefile.config
         ;;
+    (lee)
+        echo Setting up for wu...
+        if [[ -z $LEE_LARBYS_CONFIG ]]; then
+            source /etc/larbys.sh
+        fi
+        ln -sf $CAFFE_DIR/Makefile.config.lee $CAFFE_DIR/Makefile.config
+        ;;
     (TowerPower)
         echo Setting up for TowerPower...
         if [[ -z $POWER_LARBYS_CONFIG ]]; then

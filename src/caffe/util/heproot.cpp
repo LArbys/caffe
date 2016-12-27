@@ -18,7 +18,7 @@ namespace caffe {
       if(wait_counter%5000==0)
         LOG(INFO) << "Queuing data... (" << wait_counter/5000 << " sec.)" << std::endl;
     }
-
+    LOG(INFO) << "IO Thread wait time: " << wait_counter * 200 << " [usec]" << std::endl;
     //
     // Define blob dimension
     //

@@ -23,6 +23,7 @@ namespace caffe {
   // Load data and label from ROOT filename into the class property blobs.
   template <typename Dtype>
   void ROOTDataLayer<Dtype>::LoadROOTFileData() {
+    //LOG(INFO) << "Start " << __FUNCTION__ << std::endl;
 
     size_t batch_size = this->layer_param_.root_data_param().batch_size();
     std::string name  = this->layer_param_.root_data_param().filler_name();
@@ -42,14 +43,17 @@ namespace caffe {
     rh._filler_name = name;
 
     int top_size = this->layer_param_.top_size();
+    //LOG(INFO) << "Resizing blob" << std::endl;
     root_blobs_.resize(top_size);
 
     // should only be size 2: data and label, but user 
     // could put them in any order...
+    //LOG(INFO) << "Filling empty blob" << std::endl;
     for (int i = 0; i < top_size; ++i) 
       
       root_blobs_[i] = shared_ptr<Blob<Dtype> >(new Blob<Dtype>());
 
+    //LOG(INFO) << "Calling root_load_data" << std::endl;
     root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get());
 
     if(filler.thread_config())
@@ -61,7 +65,7 @@ namespace caffe {
     for (int i = 1; i < top_size; ++i) {
       CHECK_EQ(root_blobs_[i]->shape(0), num);
     }
-
+    //LOG(INFO) << "Finished " << __FUNCTION__ << std::endl;
     //else { DLOG(INFO) << "Successully loaded " << root_blobs_[0]->shape(0) << " rows"; }
   }
 

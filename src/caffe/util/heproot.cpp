@@ -10,15 +10,16 @@ namespace caffe {
   template <>
   void root_load_data<float>(root_helper& rh, Blob<float>* data_blob, Blob<float>* label_blob)
   {
+    //LOG(INFO) << "Start " << __FUNCTION__ << std::endl;
     auto& filler = ::larcv::ThreadFillerFactory::get_filler(rh._filler_name);
     size_t wait_counter=0;
     while(filler.thread_running()) {
       usleep(200);
       ++wait_counter;
       if(wait_counter%5000==0)
-        LOG(INFO) << "Queuing data... (" << wait_counter/5000 << " sec.)" << std::endl;
+        //LOG(INFO) << "Queuing data... (" << wait_counter/5000 << " sec.)" << std::endl;
     }
-    LOG(INFO) << "IO Thread wait time: " << wait_counter * 200 << " [usec]" << std::endl;
+    //LOG(INFO) << "IO Thread wait time: " << wait_counter * 200 << " [usec]" << std::endl;
     //
     // Define blob dimension
     //
@@ -41,6 +42,7 @@ namespace caffe {
     	        << " with memory size " << label.size() * sizeof(float)  << "\n";
     */
     memcpy(label_blob->mutable_cpu_data(),label_data.data(),label_data.size() * sizeof(float) );    
+    //LOG(INFO) << "Finished " << __FUNCTION__ << std::endl;
   }
 
   template <>

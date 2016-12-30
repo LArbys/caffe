@@ -770,6 +770,9 @@ message ROOTDataParameter {
   optional uint32 batch_size = 1;
   optional string filler_config = 2;
   optional string filler_name = 3;
+  optional bool use_circular_buffer = 4 [default = false];
+  optional int32 report_time = 5 [default = 0];
+  optional bool use_thread = 6 [default = false];
 }
 
 message HingeLossParameter {

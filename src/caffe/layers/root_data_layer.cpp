@@ -53,6 +53,11 @@ namespace caffe {
       // should only be size 2: data and label, but user 
       // could put them in any order...
       //LOG(INFO) << "Filling empty blob" << std::endl;
+      if(top_size != 2 && top_size != 3) {
+	LOG(ERROR) << "Top size " << top_size << "is invalid!" << std::endl;
+	throw std::exception();
+      }
+
       for (int i = 0; i < top_size; ++i) 
 	
 	root_blobs_[i] = shared_ptr<Blob<Dtype> >(new Blob<Dtype>());
@@ -60,10 +65,16 @@ namespace caffe {
       //LOG(INFO) << "Calling root_load_data" << std::endl;
       if(time_report_) {
 	io_thread_copy_timer_.start();
-	root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get());
+	if(top_size==2)
+	  root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get());
+	else
+	  root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get(), root_blobs_[2].get());
 	io_thread_copy_time_ += io_thread_copy_timer_.wall_time();
       }else{
-	root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get());	
+	if(top_size==2)
+	  root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get());
+	else
+	  root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get(), root_blobs_[2].get());
       }
 
       // MinTopBlobs==1 guarantees at least one top blob
@@ -119,10 +130,16 @@ namespace caffe {
       //LOG(INFO) << "Calling root_load_data" << std::endl;
       if(time_report_) {
 	io_thread_copy_timer_.start();
-	root_load_data(rh, root_blobs[0].get(), root_blobs[1].get());
+	if(top_size==2)
+	  root_load_data(rh, root_blobs[0].get(), root_blobs[1].get());
+	else
+	  root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get(), root_blobs_[2].get());
 	io_thread_copy_time_ += io_thread_copy_timer_.wall_time();
       }else{
-	root_load_data(rh, root_blobs[0].get(), root_blobs[1].get());	
+	if(top_size==2)
+	  root_load_data(rh, root_blobs[0].get(), root_blobs[1].get());
+	else
+	  root_load_data(rh, root_blobs_[0].get(), root_blobs_[1].get(), root_blobs_[2].get());
       }
       // MinTopBlobs==1 guarantees at least one top blob
       CHECK_GE(root_blobs[0]->num_axes(), 1) << "Input must have at least 1 axis.";

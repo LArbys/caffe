@@ -399,9 +399,12 @@ LIBRARY_DIRS += $(LIB_BUILD_DIR)
 
 LIBRARY_DIRS += $(shell larcv-config --libdir)
 LIBRARY_DIRS += $(shell root-config --libdir)
+LIBRARY_DIRS += $(HDF5_LIBDIR)
+LIBRARY_DIRS += $(OPENCV_LIBDIR)
 
 INCLUDE_DIRS += $(shell larcv-config --incdir)
 INCLUDE_DIRS += $(shell root-config --incdir)
+INCLUDE_DIRS += $(HDF5_INCDIR)
 
 # Automatic dependency generation (nvcc is handled separately)
 CXXFLAGS += -MMD -MP $(shell root-config --cflags)

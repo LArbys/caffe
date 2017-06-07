@@ -424,8 +424,13 @@ endif
 LDFLAGS += $(foreach librarydir,$(LIBRARY_DIRS),-L$(librarydir)) $(PKG_CONFIG) \
 		$(foreach library,$(LIBRARIES),-l$(library))
 
+ifdef GEO2D_BASEDIR
+LDFLAGS += $(shell geo2d-config --libs)
+endif
+
 LDFLAGS += $(shell root-config --libs)
 LDFLAGS += $(shell larcv-config --libs)
+
 #LDFLAGS += -L/usr/local/opencv/lib -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_imgcodecs -L$(LARCV_LIBDIR) -llarcv
 #LDFLAGS += $(shell larcvapp-config --libs)
 

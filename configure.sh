@@ -32,8 +32,8 @@ case `uname -n` in
         ln -sf $CAFFE_DIR/Makefile.config.towerpower $CAFFE_DIR/Makefile.config
         ;;
     (*)
-        echo Unknown machine... Using default
-        ln -sf $CAFFE_DIR/Makefile.config.example $CAFFE_DIR/Makefile.config
+        echo Unknown machine... Using container
+        ln -sf $CAFFE_DIR/Makefile.config.container $CAFFE_DIR/Makefile.config
         ;;
 esac
 

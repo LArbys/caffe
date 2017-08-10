@@ -48,6 +48,11 @@ namespace caffe {
      */
     virtual void Backward_cpu();
     virtual void Backward_gpu();
+
+    // A quick hack. This should be properly encapsulated.
+    vector<shared_ptr<Blob<Dtype> > >& blobs() {
+      return blobs_;
+    }
     
   protected:
     
@@ -57,12 +62,7 @@ namespace caffe {
     virtual void Backward_gpu(const vector<Blob<Dtype>*>& top,
 			      const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom);
 
-    
-    // A quick hack. This should be properly encapsulated.
-    vector<shared_ptr<Blob<Dtype> > >& blobs() {
-      return blobs_;
-    }
-    
+        
   protected:
     vector<shared_ptr<Blob<Dtype> > > blobs_;
     

@@ -47,7 +47,7 @@ namespace caffe {
      * Backward pass - to be called during training.
      */
     virtual void Backward_cpu();
-    virtual void Forward_gpu();
+    virtual void Backward_gpu();
     
   protected:
     

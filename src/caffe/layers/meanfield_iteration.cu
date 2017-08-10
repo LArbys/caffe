@@ -26,8 +26,7 @@ namespace caffe {
  * Forward pass during the inference.
  */
 template <typename Dtype>
-void MeanfieldIteration<Dtype>::Forward_gpu() {
-
+void MeanfieldIteration<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
 
   //------------------------------- Softmax normalization--------------------
   softmax_layer_->Forward(softmax_bottom_vec_, softmax_top_vec_);
@@ -88,7 +87,8 @@ void MeanfieldIteration<Dtype>::Forward_gpu() {
 
 
 template<typename Dtype>
-void MeanfieldIteration<Dtype>::Backward_gpu() {
+void MeanfieldIteration<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
+     				             const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
 
 
   //---------------------------- Add unary gradient --------------------------

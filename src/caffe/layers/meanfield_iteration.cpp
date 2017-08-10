@@ -283,5 +283,9 @@ void MeanfieldIteration<Dtype>::Backward_cpu() {
   softmax_layer_->Backward(softmax_top_vec_, propagate_down, softmax_bottom_vec_);
 }
 
+#ifdef CPU_ONLY
+STUB_GPU(MeanfieldIteration);
+#endif
+  
 INSTANTIATE_CLASS(MeanfieldIteration);
 }  // namespace caffe

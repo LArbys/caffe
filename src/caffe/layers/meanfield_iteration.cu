@@ -181,8 +181,10 @@ void MeanfieldIteration<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   softmax_layer_->Backward(softmax_top_vec_, propagate_down, softmax_bottom_vec_);
 }
 // Instantiate class
-template void MeanfieldIteration<float>::Forward_gpu();
-template void MeanfieldIteration<double>::Forward_gpu();
-template void MeanfieldIteration<float>::Backward_gpu();
-template void MeanfieldIteration<double>::Backward_gpu();
+//template void MeanfieldIteration<float>::Forward_gpu();
+//template void MeanfieldIteration<double>::Forward_gpu();
+//template void MeanfieldIteration<float>::Backward_gpu();
+//template void MeanfieldIteration<double>::Backward_gpu();
+
+INSTANTIATE_LAYER_GPU_FUNCS(MeanfieldIteration);
 }  // namespace caffe

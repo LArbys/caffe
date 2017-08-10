@@ -284,8 +284,18 @@ void MeanfieldIteration<Dtype>::Backward_cpu() {
 }
 
 #ifdef CPU_ONLY
+  template <typename Dtype>
+  void MeanfieldIteration<Dtype>::Forward_gpu() {};
+
+  template <typename Dtype>  
+  void MeanfieldIteration<Dtype>::Backward_gpu() {};  
+  
 STUB_GPU(MeanfieldIteration);
+
+  
 #endif
+
+
   
 INSTANTIATE_CLASS(MeanfieldIteration);
 }  // namespace caffe

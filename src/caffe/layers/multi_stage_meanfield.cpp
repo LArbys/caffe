@@ -296,6 +296,10 @@ void MultiStageMeanfieldLayer<Dtype>::compute_spatial_kernel(float* const output
   }
 }
 
+#ifdef CPU_ONLY
+  STUB_GPU(MultiStageMeanfieldLayer);
+#endif
+  
 INSTANTIATE_CLASS(MultiStageMeanfieldLayer);
 REGISTER_LAYER_CLASS(MultiStageMeanfield);
 }  // namespace caffe

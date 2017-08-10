@@ -27,6 +27,10 @@ namespace caffe {
  */
 template <typename Dtype>
 void MeanfieldIteration<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom, const vector<Blob<Dtype>*>& top) {
+     Forward_gpu();
+}
+
+void MeanfieldIteration<Dtype>::Forward_gpu() {
 
   //------------------------------- Softmax normalization--------------------
   softmax_layer_->Forward(softmax_bottom_vec_, softmax_top_vec_);
@@ -89,7 +93,10 @@ void MeanfieldIteration<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom, 
 template<typename Dtype>
 void MeanfieldIteration<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
      				             const vector<bool>& propagate_down, const vector<Blob<Dtype>*>& bottom) {
+  Backward_gpu();
+}
 
+void MeanfieldIteration<Dtype>::Backward_gpu() {
 
   //---------------------------- Add unary gradient --------------------------
   vector<bool> eltwise_propagate_down(2, true);
@@ -181,10 +188,18 @@ void MeanfieldIteration<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   softmax_layer_->Backward(softmax_top_vec_, propagate_down, softmax_bottom_vec_);
 }
 // Instantiate class
-//template void MeanfieldIteration<float>::Forward_gpu();
-//template void MeanfieldIteration<double>::Forward_gpu();
-//template void MeanfieldIteration<float>::Backward_gpu();
-//template void MeanfieldIteration<double>::Backward_gpu();
+template void MeanfieldIteration<float>::Forward_gpu();
+template void MeanfieldIteration<double>::Forward_gpu();
+template void MeanfieldIteration<float>::Backward_gpu();
+template void MeanfieldIteration<double>::Backward_gpu();
 
-INSTANTIATE_LAYER_GPU_FUNCS(MeanfieldIteration);
+template void MeanfieldIteration<float>::Forward_gpu(const vector<Blob<float>*>& bottom, const vector<Blob<float>*>& top );
+template void MeanfieldIteration<double>::Forward_gpu(const vector<Blob<double>*>& bottom, const vector<Blob<double>*>& top );
+template void MeanfieldIteration<float>::Backward_gpu(const vector<Blob<float>*>& top,
+     				             const vector<bool>& propagate_down, const vector<Blob<float>*>& bottom);
+template void MeanfieldIteration<double>::Backward_gpu(const vector<Blob<double>*>& top,
+     				             const vector<bool>& propagate_down, const vector<Blob<double>*>& bottom);
+
+
+//INSTANTIATE_LAYER_GPU_FUNCS(MeanfieldIteration);
 }  // namespace caffe

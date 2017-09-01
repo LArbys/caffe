@@ -30,6 +30,7 @@ void MeanfieldIteration<Dtype>::Forward_gpu(const vector<Blob<Dtype>*>& bottom, 
      Forward_gpu();
 }
 
+template <typename Dtype>
 void MeanfieldIteration<Dtype>::Forward_gpu() {
 
   //------------------------------- Softmax normalization--------------------
@@ -96,6 +97,7 @@ void MeanfieldIteration<Dtype>::Backward_gpu(const vector<Blob<Dtype>*>& top,
   Backward_gpu();
 }
 
+template<typename Dtype>
 void MeanfieldIteration<Dtype>::Backward_gpu() {
 
   //---------------------------- Add unary gradient --------------------------

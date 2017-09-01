@@ -17,6 +17,9 @@ namespace caffe {
   
   template <typename Dtype>
   void root_load_data(root_helper& rh, Blob<Dtype>* data_blob, Blob<Dtype>* label_blob);
+
+  template <typename Dtype>
+  void root_load_data(root_helper& rh, Blob<Dtype>* data_blob, Blob<Dtype>* label_blob, Blob<Dtype>* weight_blob);
   
 }  // namespace caffe
 

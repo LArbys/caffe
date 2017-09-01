@@ -459,6 +459,12 @@ message LossParameter {
   // is not specified, then setting this to false will be equivalent to
   // normalization = BATCH_SIZE to be consistent with previous behavior.
   optional bool normalize = 2;
+  // This option is valid only for binary classification
+  // Class weight of class=1 is applied to pixels
+  // where the *label* is 1  
+  // If this option is true, class weight will be applied also to
+  // pixels where the *prediction* is 1.  
+  optional bool weigh_prediction_class = 5 [default = false];
 }
 
 // Messages that store parameters used by individual layer types follow, in
@@ -770,6 +776,9 @@ message ROOTDataParameter {
   optional uint32 batch_size = 1;
   optional string filler_config = 2;
   optional string filler_name = 3;
+  optional bool use_circular_buffer = 4 [default = false];
+  optional int32 report_time = 5 [default = 0];
+  optional bool use_thread = 6 [default = false];
 }
 
 message HingeLossParameter {

@@ -62,6 +62,8 @@ class SoftmaxWithLossLayer : public LossLayer<Dtype> {
   virtual inline int ExactNumTopBlobs() const { return -1; }
   virtual inline int MinTopBlobs() const { return 1; }
   virtual inline int MaxTopBlobs() const { return 2; }
+  virtual inline int MaxBottomBlobs() const { return 3; }
+  virtual inline int ExactNumBottomBlobs() const { return -1; }
 
  protected:
   virtual void Forward_cpu(const vector<Blob<Dtype>*>& bottom,
@@ -128,6 +130,8 @@ class SoftmaxWithLossLayer : public LossLayer<Dtype> {
   // Ref: https://github.com/mohamed-ezz/caffe/commit/876e387a6d7f8974f68f42beacd3728b4fc92ff7
   /// provide loss weights for different classes to compensate for unbalanaced training data or different importance of the classes
   vector<float> class_loss_weights_;
+  // Flag to extend the applied weight values to predicted class
+  bool weigh_prediction_class_;
 };
 
 }  // namespace caffe

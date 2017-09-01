@@ -26,6 +26,7 @@ OPENCV_VERSION := 3
 
 # CUDA directory contains bin/ and lib/ directories that we need.
 CUDA_DIR := /usr/local/cuda
+
 # On Ubuntu 14.04, if cuda tools are installed via
 # "sudo apt-get install nvidia-cuda-toolkit" then use this instead:
 # CUDA_DIR := /usr
@@ -43,7 +44,7 @@ CUDA_ARCH := -gencode arch=compute_20,code=sm_20 \
 # atlas for ATLAS (default)
 # mkl for MKL
 # open for OpenBlas
-BLAS := open
+BLAS := atlas
 # Custom (MKL/ATLAS/OpenBLAS) include and lib directories.
 # Leave commented to accept the defaults for your choice of BLAS
 # (which should work)!
@@ -62,7 +63,7 @@ BLAS := open
 # NOTE: this is required only if you will compile the python interface.
 # We need to be able to find Python.h and numpy/arrayobject.h.
 PYTHON_INCLUDE := /usr/include/python2.7 \
-		/usr/local/lib/python2.7/dist-packages/numpy/core/include
+		/usr/lib/python2.7/dist-packages/numpy/core/include
 # Anaconda Python distribution is quite popular. Include path:
 # Verify anaconda location, sometimes it's in root.
 # ANACONDA_HOME := $(HOME)/anaconda
@@ -84,11 +85,15 @@ PYTHON_LIB := /usr/lib
 # PYTHON_LIB += $(shell brew --prefix numpy)/lib
 
 # Uncomment to support layers written in Python (will link against Python libs)
-WITH_PYTHON_LAYER := 1
+# WITH_PYTHON_LAYER := 1
 
 # Whatever else you find you need goes here.
-INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/local/opencv/include
-LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/local/opencv/lib
+INCLUDE_DIRS := $(PYTHON_INCLUDE) /usr/local/include /usr/local/cudnn/include
+LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/local/cudnn/lib64
+
+#Add OpenCV to the include and lib dirs:
+INCLUDE_DIRS += shell $(OPENCV_INCDIR)
+LIBRARY_DIRS += shell $(OPENCV_LIBDIR)
 
 # If Homebrew is installed at a non standard location (for example your home directory) and you use it for general dependencies
 # INCLUDE_DIRS += $(shell brew --prefix)/include
@@ -98,11 +103,12 @@ LIBRARY_DIRS := $(PYTHON_LIB) /usr/local/lib /usr/lib /usr/local/opencv/lib
 # (Usually not necessary -- OpenCV libraries are normally installed in one of the above $LIBRARY_DIRS.)
 # USE_PKG_CONFIG := 1
 
+# N.B. both build and distribute dirs are cleared on `make clean`
 BUILD_DIR := build
 DISTRIBUTE_DIR := distribute
 
 # Uncomment for debugging. Does not work on OSX due to https://github.com/BVLC/caffe/issues/171
-#DEBUG := 1
+# DEBUG := 1
 
 # The ID of the GPU that 'make runtest' will use to run unit tests.
 TEST_GPUID := 0

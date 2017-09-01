@@ -8,6 +8,7 @@ fi
 case `uname -n` in 
     (nunet)
         echo Setting up for nudot...
+	source $CAFFE_DIR/my_larbys.sh
         ln -sf $CAFFE_DIR/Makefile.config.nudot $CAFFE_DIR/Makefile.config
         ;;
     (davis)

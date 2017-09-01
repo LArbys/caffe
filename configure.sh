@@ -6,7 +6,7 @@ if [[ -z $CAFFE_DIR ]]; then
 fi
 
 case `uname -n` in 
-    (nudot)
+    (nunet)
         echo Setting up for nudot...
         ln -sf $CAFFE_DIR/Makefile.config.nudot $CAFFE_DIR/Makefile.config
         ;;

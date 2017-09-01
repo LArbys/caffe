@@ -178,7 +178,7 @@ ifneq ($(CPU_ONLY), 1)
 	LIBRARIES := cudart cublas curand
 endif
 
-LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_hl hdf5 
+LIBRARIES += glog gflags protobuf boost_system boost_filesystem m hdf5_serial_hl hdf5_serial 
 
 # handle IO dependencies
 USE_LEVELDB ?= 1
@@ -399,9 +399,12 @@ LIBRARY_DIRS += $(LIB_BUILD_DIR)
 
 LIBRARY_DIRS += $(shell larcv-config --libdir)
 LIBRARY_DIRS += $(shell root-config --libdir)
+LIBRARY_DIRS += $(HDF5_LIBDIR)
+LIBRARY_DIRS += $(OPENCV_LIBDIR)
 
 INCLUDE_DIRS += $(shell larcv-config --incdir)
 INCLUDE_DIRS += $(shell root-config --incdir)
+INCLUDE_DIRS += $(HDF5_INCDIR)
 
 # Automatic dependency generation (nvcc is handled separately)
 CXXFLAGS += -MMD -MP $(shell root-config --cflags)

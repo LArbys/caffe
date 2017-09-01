@@ -10,6 +10,10 @@ case `uname -n` in
         echo Setting up for nudot...
         ln -sf $CAFFE_DIR/Makefile.config.nudot $CAFFE_DIR/Makefile.config
         ;;
+    (davis)
+        echo Setting up for davis...
+        ln -sf $CAFFE_DIR/Makefile.config.nudot $CAFFE_DIR/Makefile.config
+        ;;
     (wu)
         echo Setting up for wu...
         if [[ -z $WU_LARBYS_CONFIG ]]; then

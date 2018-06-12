@@ -31,6 +31,10 @@ case `uname -n` in
         fi
         ln -sf $CAFFE_DIR/Makefile.config.towerpower $CAFFE_DIR/Makefile.config
         ;;
+    (hopper.nevis.columbia.edu)
+	echo Setting up for hopper...
+        ln -sf $CAFFE_DIR/Makefile.config.hopper $CAFFE_DIR/Makefile.config
+	;;
     (*)
         echo Unknown machine... Using default
         ln -sf $CAFFE_DIR/Makefile.config.example $CAFFE_DIR/Makefile.config
